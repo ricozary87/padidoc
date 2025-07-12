@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from config.db import SessionLocal
+from backend.src.config.db import SessionLocal
 from contextlib import contextmanager
 
 @contextmanager

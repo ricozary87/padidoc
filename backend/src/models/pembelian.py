@@ -12,16 +12,12 @@ class Pembelian(Base):
     jenis_produk = Column(String(50))   # gabah / PK / beras / katul
     status = Column(String(50))        # basah / kering / PK
     berat_kg = Column(Float)
+    total_harga = Column(Float)
     harga_per_kg = Column(Float)
+    
     catatan = Column(Text)
 
     def __repr__(self):
         return f"<Pembelian(id={self.id}, tanggal='{self.tanggal}', total_harga='{self.total_harga}')>"
 
-    @property
-    def total_harga(self):
-        """Menghitung total harga secara otomatis."""
-        if self.berat_kg is not None and self.harga_per_kg is not None:
-            return self.berat_kg * self.harga_per_kg
-        return 0
 

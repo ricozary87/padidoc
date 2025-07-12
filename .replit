@@ -1,0 +1,21 @@
+run = "uvicorn backend.src.app:app --host 0.0.0.0 --port 8000 --reload"
+modules = ["python-3.11"]
+
+[nix]
+channel = "stable-24_05"
+packages = ["glibcLocales", "libxcrypt", "python310", "mailutils"]
+
+[deployment]
+run = ["sh", "-c", "uvicorn backend.src.app:app --host 0.0.0.0 --port 8000 --reload"]
+
+[[ports]]
+localPort = 3000
+externalPort = 3001
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+[[ports]]
+localPort = 8100
+externalPort = 3000
