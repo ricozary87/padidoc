@@ -26,6 +26,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/dashboard/transactions", async (req, res) => {
+    try {
+      const [pembelian, penjualan, pengeluaran] = await Promise.all([
+        storage.getAllPembelian(),
+        storage.getAllPenjualan(),
+        storage.getAllPengeluaran(),
+      ]);
+
+      // Format all transactions with consistent structure
+      const allTransactions = [
+        ...pembelian.map(p => ({
+          id: `pembelian-${p.id}`,
+          type: 'pembelian',
+          description: `Pembelian ${p.jenisBarang || p.jenisGabah}`,
+          amount: parseFloat(p.jumlah.toString()),
+          value: parseFloat(p.totalHarga.toString()),
+          date: p.createdAt || new Date()
+        })),
+        ...penjualan.map(p => ({
+          id: `penjualan-${p.id}`,
+          type: 'penjualan',
+          description: `Penjualan ${p.jenisBarang || p.jenisBeras}`,
+          amount: parseFloat(p.jumlah.toString()),
+          value: parseFloat(p.totalHarga.toString()),
+          date: p.createdAt || new Date()
+        })),
+        ...pengeluaran.map(p => ({
+          id: `pengeluaran-${p.id}`,
+          type: 'pengeluaran',
+          description: p.deskripsi || p.kategori,
+          amount: 0,
+          value: parseFloat(p.jumlah.toString()),
+          date: p.createdAt || new Date()
+        }))
+      ];
+
+      // Sort by date (newest first) and limit to 20 most recent
+      const sortedTransactions = allTransactions
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 20);
+
+      res.json(sortedTransactions);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      res.status(500).json({ message: "Failed to fetch transactions" });
+    }
+  });
+
   // Supplier routes
   app.get("/api/suppliers", async (req, res) => {
     try {

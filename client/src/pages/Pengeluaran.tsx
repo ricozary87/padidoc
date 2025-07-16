@@ -45,6 +45,8 @@ export default function Pengeluaran() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pengeluaran"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/metrics"] });
       toast({
         title: "Sukses",
         description: "Pengeluaran berhasil ditambahkan",
@@ -68,6 +70,8 @@ export default function Pengeluaran() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pengeluaran"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/metrics"] });
       toast({
         title: "Sukses",
         description: "Pengeluaran berhasil diperbarui",
@@ -91,6 +95,8 @@ export default function Pengeluaran() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pengeluaran"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/metrics"] });
       toast({
         title: "Sukses",
         description: "Pengeluaran berhasil dihapus",

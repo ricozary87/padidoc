@@ -59,6 +59,8 @@ export default function Penjualan() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/penjualan"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/metrics"] });
       toast({
         title: "Sukses",
         description: "Penjualan berhasil ditambahkan",
@@ -82,6 +84,8 @@ export default function Penjualan() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/penjualan"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/metrics"] });
       toast({
         title: "Sukses",
         description: "Penjualan berhasil diperbarui",
@@ -105,6 +109,8 @@ export default function Penjualan() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/penjualan"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/metrics"] });
       toast({
         title: "Sukses",
         description: "Penjualan berhasil dihapus",

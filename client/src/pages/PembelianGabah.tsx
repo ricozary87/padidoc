@@ -84,6 +84,8 @@ export default function PembelianGabah() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pembelian"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/metrics"] });
       toast({
         title: "Sukses",
         description: "Pembelian berhasil ditambahkan",
@@ -107,6 +109,8 @@ export default function PembelianGabah() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pembelian"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/metrics"] });
       toast({
         title: "Sukses",
         description: "Pembelian berhasil diperbarui",
@@ -130,6 +134,8 @@ export default function PembelianGabah() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pembelian"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/metrics"] });
       toast({
         title: "Sukses",
         description: "Pembelian berhasil dihapus",

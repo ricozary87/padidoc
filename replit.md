@@ -158,3 +158,11 @@ The architecture supports a complete rice mill operation with real-time inventor
   - Restructured layout with proper side-by-side alignment of key panels
   - Moved Recent Activities to its own dedicated section
   - Fixed responsive layout for better mobile and tablet viewing
+- **Transaction History Panel Enhancement (January 2025)**
+  - **Converted "Transaksi Terbaru" to "Riwayat Transaksi"**: Changed panel title and icon to reflect transaction history focus
+  - **Auto-refresh functionality**: Added 30-second interval auto-refresh using React Query with `refetchInterval`
+  - **Real-time updates**: Implemented comprehensive cache invalidation across all transaction mutations
+  - **Enhanced API endpoint**: Created `/api/dashboard/transactions` for comprehensive transaction history from all sources
+  - **Improved UI**: Added loading states, hover effects, and better visual feedback
+  - **Multi-transaction support**: Shows pembelian, penjualan, and pengeluaran in unified history view
+  - **Cache invalidation**: All transaction mutations now invalidate dashboard caches for real-time updates
