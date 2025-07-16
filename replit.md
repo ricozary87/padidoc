@@ -2,7 +2,7 @@
 
 ## Overview
 
-PadiDoc is a comprehensive rice mill management system built with React, Express, and PostgreSQL. The application manages the complete rice production workflow from grain purchasing to rice sales, including drying, production, inventory management, and financial tracking.
+PadiDoc is a comprehensive rice mill management system built with React, Express, and PostgreSQL. The application manages the complete rice production workflow from grain purchasing to rice sales, including drying, production, inventory management, financial tracking, and customizable PDF invoice generation.
 
 ## User Preferences
 
@@ -49,13 +49,14 @@ The system manages eight core entities:
 
 ### Frontend Pages
 - **Dashboard**: Overview with metrics, quick actions, and recent activities
-- **Pembelian Gabah**: Grain purchasing management
+- **Pembelian Gabah**: Grain purchasing management with PDF invoice printing
 - **Pengeringan**: Drying process tracking
 - **Produksi**: Production management
-- **Penjualan**: Sales management
+- **Penjualan**: Sales management with PDF invoice printing
 - **Pengeluaran**: Expense tracking
 - **Stok**: Inventory management
 - **Laporan**: Reporting and analytics
+- **Settings**: Company configuration for invoice customization
 
 ### Shared Components
 - **DataTable**: Reusable table component with search and sorting

@@ -12,6 +12,7 @@ import Penjualan from "@/pages/Penjualan";
 import Pengeluaran from "@/pages/Pengeluaran";
 import Stok from "@/pages/Stok";
 import Laporan from "@/pages/Laporan";
+import Settings from "@/pages/Settings";
 
 function Router() {
   return (
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/pengeluaran" component={Pengeluaran} />
       <Route path="/stok" component={Stok} />
       <Route path="/laporan" component={Laporan} />
+      <Route path="/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
   );

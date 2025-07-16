@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Edit, Trash2, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Printer } from "lucide-react";
 import { insertPembelianSchema, insertSupplierSchema } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { generateInvoicePdf, generateInvoiceNumber } from "@/lib/generatePdf";
 
 type FormData = {
   supplierId: string;
@@ -44,6 +45,10 @@ export default function PembelianGabah() {
 
   const { data: suppliers } = useQuery({
     queryKey: ["/api/suppliers"],
+  });
+
+  const { data: settings } = useQuery({
+    queryKey: ["/api/settings"],
   });
 
   const form = useForm<FormData>({
@@ -211,6 +216,37 @@ export default function PembelianGabah() {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('id-ID');
+  };
+
+  const handlePrint = (purchase: any) => {
+    const supplier = suppliers?.find((s: any) => s.id === purchase.supplierId);
+    
+    const invoiceData = {
+      type: "pembelian" as const,
+      invoiceNumber: generateInvoiceNumber("pembelian"),
+      date: purchase.tanggal,
+      customerName: supplier?.nama || "Supplier",
+      customerAddress: supplier?.alamat,
+      customerPhone: supplier?.telepon,
+      items: [{
+        description: `${purchase.jenisBarang === "gabah" ? "Gabah" : purchase.jenisBarang.charAt(0).toUpperCase() + purchase.jenisBarang.slice(1)} ${purchase.jenisGabah || ""}`.trim(),
+        quantity: purchase.jumlah,
+        unit: "kg",
+        price: purchase.hargaPerKg,
+        total: purchase.totalHarga,
+      }],
+      subtotal: purchase.totalHarga,
+      total: purchase.totalHarga,
+      notes: purchase.catatan,
+      paymentMethod: "Tunai",
+    };
+
+    generateInvoicePdf(settings, invoiceData);
+    
+    toast({
+      title: "Berhasil",
+      description: "Nota pembelian berhasil diunduh",
+    });
   };
 
   return (
@@ -511,6 +547,14 @@ export default function PembelianGabah() {
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handlePrint(item)}
+                              title="Cetak Nota"
+                            >
+                              <Printer className="h-4 w-4" />
+                            </Button>
                             <Button
                               size="sm"
                               variant="outline"

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Edit, Trash2, Search, DollarSign } from "lucide-react";
+import { Plus, Edit, Trash2, Search, DollarSign, Printer } from "lucide-react";
 import { insertPenjualanSchema } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { generateInvoicePdf, generateInvoiceNumber } from "@/lib/generatePdf";
 
 export default function Penjualan() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -29,6 +30,10 @@ export default function Penjualan() {
 
   const { data: customers } = useQuery({
     queryKey: ["/api/customers"],
+  });
+
+  const { data: settings } = useQuery({
+    queryKey: ["/api/settings"],
   });
 
   const form = useForm({
@@ -166,6 +171,37 @@ export default function Penjualan() {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const handlePrint = (sale: any) => {
+    const customer = customers?.find((c: any) => c.id === sale.customerId);
+    
+    const invoiceData = {
+      type: "penjualan" as const,
+      invoiceNumber: generateInvoiceNumber("penjualan"),
+      date: sale.tanggal,
+      customerName: customer?.nama || "Customer",
+      customerAddress: customer?.alamat,
+      customerPhone: customer?.telepon,
+      items: [{
+        description: `${sale.jenisBarang === "beras" ? "Beras" : sale.jenisBarang.charAt(0).toUpperCase() + sale.jenisBarang.slice(1)} ${sale.jenisBeras || ""}`.trim(),
+        quantity: sale.jumlah,
+        unit: "kg",
+        price: sale.hargaPerKg,
+        total: sale.totalHarga,
+      }],
+      subtotal: sale.totalHarga,
+      total: sale.totalHarga,
+      notes: sale.catatan,
+      paymentMethod: "Tunai",
+    };
+
+    generateInvoicePdf(settings, invoiceData);
+    
+    toast({
+      title: "Berhasil",
+      description: "Nota penjualan berhasil diunduh",
+    });
   };
 
   const formatCurrency = (amount: string | number) => {
@@ -443,6 +479,14 @@ export default function Penjualan() {
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handlePrint(item)}
+                              title="Cetak Nota"
+                            >
+                              <Printer className="h-4 w-4" />
+                            </Button>
                             <Button
                               size="sm"
                               variant="outline"

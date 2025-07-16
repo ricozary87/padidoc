@@ -141,6 +141,22 @@ export const logStok = pgTable("log_stok", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Settings table untuk menyimpan informasi perusahaan
+export const settings = pgTable("settings", {
+  id: serial("id").primaryKey(),
+  companyName: varchar("company_name", { length: 255 }).notNull(),
+  companyAddress: text("company_address"),
+  companyPhone: varchar("company_phone", { length: 50 }),
+  companyEmail: varchar("company_email", { length: 255 }),
+  companyLogo: text("company_logo"), // Base64 encoded logo
+  companyNpwp: varchar("company_npwp", { length: 50 }),
+  invoiceFooter: text("invoice_footer"),
+  bankName: varchar("bank_name", { length: 100 }),
+  bankAccount: varchar("bank_account", { length: 50 }),
+  bankAccountName: varchar("bank_account_name", { length: 255 }),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const suppliersRelations = relations(suppliers, ({ many }) => ({
   pembelian: many(pembelian),
@@ -209,6 +225,7 @@ export const insertPenjualanSchema = createInsertSchema(penjualan).omit({ id: tr
 export const insertPengeluaranSchema = createInsertSchema(pengeluaran).omit({ id: true, createdAt: true });
 export const insertStokSchema = createInsertSchema(stok).omit({ id: true, updatedAt: true });
 export const insertLogStokSchema = createInsertSchema(logStok).omit({ id: true, createdAt: true });
+export const insertSettingsSchema = createInsertSchema(settings).omit({ id: true, updatedAt: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -231,3 +248,5 @@ export type Stok = typeof stok.$inferSelect;
 export type InsertStok = z.infer<typeof insertStokSchema>;
 export type LogStok = typeof logStok.$inferSelect;
 export type InsertLogStok = z.infer<typeof insertLogStokSchema>;
+export type Settings = typeof settings.$inferSelect;
+export type InsertSettings = z.infer<typeof insertSettingsSchema>;

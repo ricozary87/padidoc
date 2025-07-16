@@ -9,6 +9,7 @@ import {
   pengeluaran,
   stok,
   logStok,
+  settings,
   type User,
   type InsertUser,
   type Supplier,
@@ -29,6 +30,8 @@ import {
   type InsertStok,
   type LogStok,
   type InsertLogStok,
+  type Settings,
+  type InsertSettings,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
@@ -106,8 +109,17 @@ export interface IStorage {
     todayProduction: number;
     todaySales: number;
     stockRice: number;
+    stockGabah?: number; // UPDATE INI UNTUK MULTI PRODUK
+    stockKatul?: number; // UPDATE INI UNTUK MULTI PRODUK
+    stockMenir?: number; // UPDATE INI UNTUK MULTI PRODUK
+    stockSekam?: number; // UPDATE INI UNTUK MULTI PRODUK
     recentTransactions: any[];
   }>;
+
+  // Settings operations
+  getSettings(): Promise<Settings | undefined>;
+  createSettings(settings: InsertSettings): Promise<Settings>;
+  updateSettings(id: number, settings: Partial<InsertSettings>): Promise<Settings>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -421,6 +433,22 @@ export class DatabaseStorage implements IStorage {
       stockSekam: sekamStock[0]?.total || 0, // UPDATE INI UNTUK MULTI PRODUK
       recentTransactions,
     };
+  }
+
+  // Settings operations
+  async getSettings(): Promise<Settings | undefined> {
+    const [settingsRecord] = await db.select().from(settings);
+    return settingsRecord || undefined;
+  }
+
+  async createSettings(insertSettings: InsertSettings): Promise<Settings> {
+    const [settingsRecord] = await db.insert(settings).values(insertSettings).returning();
+    return settingsRecord;
+  }
+
+  async updateSettings(id: number, updateSettings: Partial<InsertSettings>): Promise<Settings> {
+    const [settingsRecord] = await db.update(settings).set(updateSettings).where(eq(settings.id, id)).returning();
+    return settingsRecord;
   }
 }
 

@@ -18,11 +18,12 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: ChartLine },
   { name: "Pembelian Gabah", href: "/pembelian", icon: ShoppingCart },
   { name: "Pengeringan", href: "/pengeringan", icon: Sun },
-  { name: "Produksi", href: "/produksi", icon: Settings },
+  { name: "Produksi", href: "/produksi", icon: Package },
   { name: "Penjualan", href: "/penjualan", icon: DollarSign },
   { name: "Pengeluaran", href: "/pengeluaran", icon: Receipt },
   { name: "Stok", href: "/stok", icon: Package },
   { name: "Laporan", href: "/laporan", icon: BarChart3 },
+  { name: "Pengaturan", href: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
