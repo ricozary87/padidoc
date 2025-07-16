@@ -49,6 +49,11 @@ export default function Dashboard() {
     queryKey: ["/api/pengeluaran"],
   });
 
+  // Fetch production data for weekly trends
+  const { data: produksi } = useQuery({
+    queryKey: ["/api/produksi"],
+  });
+
   // Simulation state
   const [isSimulationOpen, setIsSimulationOpen] = useState(false);
   const [simulationData, setSimulationData] = useState({
@@ -66,6 +71,44 @@ export default function Dashboard() {
   // Calculate cash flow data
   const cashFlowData = calculateWeeklyCashFlow(penjualan || [], pembelian || [], pengeluaran || []);
   const chartData = generateDailyCashFlowData(penjualan || [], pembelian || [], pengeluaran || []);
+
+  // Calculate weekly production trends
+  const calculateWeeklyProduction = (productionData: any[]) => {
+    if (!productionData || productionData.length === 0) return [];
+    
+    const weeklyData = productionData.reduce((acc: any, item: any) => {
+      const date = new Date(item.tanggal);
+      const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
+      const weekKey = weekStart.toISOString().split('T')[0];
+      
+      if (!acc[weekKey]) {
+        acc[weekKey] = {
+          week: weekKey,
+          totalGabah: 0,
+          totalBeras: 0,
+          totalKatul: 0,
+          totalMenir: 0,
+          totalSekam: 0,
+          count: 0
+        };
+      }
+      
+      acc[weekKey].totalGabah += parseFloat(item.jumlahGabah || 0);
+      acc[weekKey].totalBeras += parseFloat(item.jumlahBeras || 0);
+      acc[weekKey].totalKatul += parseFloat(item.jumlahKatul || 0);
+      acc[weekKey].totalMenir += parseFloat(item.jumlahMenir || 0);
+      acc[weekKey].totalSekam += parseFloat(item.jumlahSekam || 0);
+      acc[weekKey].count += 1;
+      
+      return acc;
+    }, {});
+    
+    return Object.values(weeklyData)
+      .sort((a: any, b: any) => new Date(a.week).getTime() - new Date(b.week).getTime())
+      .slice(-4); // Last 4 weeks
+  };
+
+  const weeklyProductionData = calculateWeeklyProduction(produksi || []);
 
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('id-ID').format(num);
@@ -591,7 +634,7 @@ export default function Dashboard() {
 
           </div>
 
-          {/* Arus Kas Mingguan dan Jadwal Pengeringan */}
+          {/* Arus Kas Mingguan dan Tren Produksi Mingguan */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card className="shadow-sm border border-gray-200">
               <CardHeader>
@@ -691,25 +734,110 @@ export default function Dashboard() {
             <Card className="shadow-sm border border-gray-200">
               <CardHeader>
                 <CardTitle className="text-lg font-inter font-semibold text-gray-900">
-                  Jadwal Pengeringan
+                  Tren Produksi Mingguan
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-                  <p className="text-sm font-medium text-gray-900">Batch #12345</p>
-                  <p className="text-xs text-gray-500">Mulai: 08:00 WIB</p>
-                  <p className="text-xs text-blue-600">Sedang Berjalan</p>
-                </div>
-                <div className="p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
-                  <p className="text-sm font-medium text-gray-900">Batch #12346</p>
-                  <p className="text-xs text-gray-500">Mulai: 14:00 WIB</p>
-                  <p className="text-xs text-yellow-600">Menunggu</p>
-                </div>
-                <div className="p-3 bg-green-50 rounded-lg border-l-4 border-green-500">
-                  <p className="text-sm font-medium text-gray-900">Batch #12344</p>
-                  <p className="text-xs text-gray-500">Selesai: 06:00 WIB</p>
-                  <p className="text-xs text-green-600">Selesai</p>
-                </div>
+              <CardContent className="space-y-4">
+                {weeklyProductionData.length > 0 ? (
+                  <>
+                    {/* Chart */}
+                    <div className="h-48">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={weeklyProductionData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                          <XAxis 
+                            dataKey="week"
+                            tickFormatter={(value) => {
+                              const date = new Date(value);
+                              return `${date.getDate()}/${date.getMonth() + 1}`;
+                            }}
+                            fontSize={12}
+                          />
+                          <YAxis fontSize={12} />
+                          <Tooltip 
+                            labelFormatter={(value) => {
+                              const date = new Date(value);
+                              return `Minggu: ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                            }}
+                            formatter={(value, name) => [
+                              `${formatNumber(value)} kg`,
+                              name === 'totalBeras' ? 'Beras' :
+                              name === 'totalGabah' ? 'Gabah' :
+                              name === 'totalKatul' ? 'Katul' :
+                              name === 'totalMenir' ? 'Menir' : 'Sekam'
+                            ]}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="totalBeras" 
+                            stroke="#10b981" 
+                            strokeWidth={2}
+                            dot={{ fill: '#10b981', strokeWidth: 2 }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="totalGabah" 
+                            stroke="#f59e0b" 
+                            strokeWidth={2}
+                            dot={{ fill: '#f59e0b', strokeWidth: 2 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    {/* Summary Stats */}
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Total Beras:</span>
+                          <span className="font-mono text-green-600">
+                            {formatNumber(weeklyProductionData.reduce((sum: number, week: any) => sum + week.totalBeras, 0))} kg
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Total Gabah:</span>
+                          <span className="font-mono text-amber-600">
+                            {formatNumber(weeklyProductionData.reduce((sum: number, week: any) => sum + week.totalGabah, 0))} kg
+                          </span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Total Katul:</span>
+                          <span className="font-mono text-blue-600">
+                            {formatNumber(weeklyProductionData.reduce((sum: number, week: any) => sum + week.totalKatul, 0))} kg
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Rata-rata Rendemen:</span>
+                          <span className="font-mono text-purple-600">
+                            {weeklyProductionData.length > 0 ? 
+                              ((weeklyProductionData.reduce((sum: number, week: any) => sum + week.totalBeras, 0) / 
+                                weeklyProductionData.reduce((sum: number, week: any) => sum + week.totalGabah, 0)) * 100).toFixed(1) : 0}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Link to production page */}
+                    <div className="pt-3 border-t border-gray-200">
+                      <Button 
+                        variant="outline" 
+                        className="w-full flex items-center justify-center space-x-2 text-sm hover:bg-green-50 hover:border-green-500 transition-colors"
+                        onClick={() => setLocation('/produksi')}
+                      >
+                        <TrendingUp className="h-4 w-4" />
+                        <span>Lihat Detail Produksi</span>
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <BarChart3 className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                    <p className="text-sm">Belum ada data produksi mingguan</p>
+                    <p className="text-xs mt-1">Mulai produksi untuk melihat tren</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
