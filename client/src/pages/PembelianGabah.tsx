@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -81,7 +81,7 @@ export default function PembelianGabah() {
   const watchJumlah = form.watch("jumlah");
   const watchHargaPerKg = form.watch("hargaPerKg");
   
-  React.useEffect(() => {
+  useEffect(() => {
     const jumlah = parseFloat(watchJumlah) || 0;
     const hargaPerKg = parseFloat(watchHargaPerKg) || 0;
     const totalHarga = jumlah * hargaPerKg;
