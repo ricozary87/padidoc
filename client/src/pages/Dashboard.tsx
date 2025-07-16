@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Bell, ShoppingCart, Settings, DollarSign, Package, BarChart3, Calculator, Plus, CheckCircle, XCircle, Scale } from "lucide-react";
+import { Bell, ShoppingCart, Settings, DollarSign, Package, BarChart3, Calculator, Plus, CheckCircle, XCircle, Scale, TrendingUp, TrendingDown, Wallet, ExternalLink } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import MetricsCard from "@/components/MetricsCard";
 import RecentActivities from "@/components/RecentActivities";
@@ -13,10 +13,25 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { calculateWeeklyCashFlow, generateDailyCashFlowData, formatCurrency, formatNumber } from "@/lib/cashFlowCalculator";
 
 export default function Dashboard() {
   const { data: metrics, isLoading } = useQuery({
     queryKey: ["/api/dashboard/metrics"],
+  });
+
+  // Fetch transaction data for cash flow calculations
+  const { data: penjualan } = useQuery({
+    queryKey: ["/api/penjualan"],
+  });
+  
+  const { data: pembelian } = useQuery({
+    queryKey: ["/api/pembelian"],
+  });
+  
+  const { data: pengeluaran } = useQuery({
+    queryKey: ["/api/pengeluaran"],
   });
 
   // Simulation state
@@ -32,6 +47,10 @@ export default function Dashboard() {
     rendemenSekam: "15"
   });
   const [simulationResult, setSimulationResult] = useState<any>(null);
+
+  // Calculate cash flow data
+  const cashFlowData = calculateWeeklyCashFlow(penjualan || [], pembelian || [], pengeluaran || []);
+  const chartData = generateDailyCashFlowData(penjualan || [], pembelian || [], pengeluaran || []);
 
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('id-ID').format(num);
@@ -532,6 +551,115 @@ export default function Dashboard() {
                       </div>
                     </DialogContent>
                   </Dialog>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Cash Flow Panel */}
+            <Card className="shadow-sm border border-gray-200">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-inter font-semibold text-gray-900 flex items-center space-x-2">
+                    <Wallet className="h-5 w-5 text-blue-600" />
+                    <span>Arus Kas Mingguan</span>
+                  </CardTitle>
+                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${cashFlowData.statusBg}`}>
+                    <span className="text-sm">{cashFlowData.statusIcon}</span>
+                    <span className={`text-sm font-medium ${cashFlowData.statusColor}`}>
+                      {cashFlowData.status}
+                    </span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Cash Flow Summary */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Modal Awal</span>
+                      <span className="font-mono text-sm font-medium text-gray-900">
+                        {formatCurrency(cashFlowData.modalAwal)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600 flex items-center space-x-1">
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                        <span>Pemasukan</span>
+                      </span>
+                      <span className="font-mono text-sm font-medium text-green-600">
+                        {formatCurrency(cashFlowData.totalPemasukan)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600 flex items-center space-x-1">
+                        <TrendingDown className="h-4 w-4 text-red-500" />
+                        <span>Pengeluaran</span>
+                      </span>
+                      <span className="font-mono text-sm font-medium text-red-600">
+                        {formatCurrency(cashFlowData.totalKeluar)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 border-t">
+                      <span className="text-sm font-medium text-gray-900">Saldo Akhir</span>
+                      <span className={`font-mono text-sm font-bold ${
+                        cashFlowData.saldoAkhir >= cashFlowData.modalAwal ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {formatCurrency(cashFlowData.saldoAkhir)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Mini Chart */}
+                  <div className="space-y-2">
+                    <h5 className="text-sm font-medium text-gray-700">Trend 7 Hari</h5>
+                    <div className="h-32">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={chartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis 
+                            dataKey="date" 
+                            tick={{ fontSize: 10 }}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <YAxis hide />
+                          <Tooltip 
+                            formatter={(value, name) => [
+                              formatCurrency(value), 
+                              name === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran'
+                            ]}
+                            labelFormatter={(label) => `Tanggal: ${label}`}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="pemasukan" 
+                            stroke="#10b981" 
+                            strokeWidth={2}
+                            dot={{ fill: '#10b981', strokeWidth: 2, r: 3 }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="pengeluaran" 
+                            stroke="#ef4444" 
+                            strokeWidth={2}
+                            dot={{ fill: '#ef4444', strokeWidth: 2, r: 3 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Detail Button */}
+                <div className="pt-3 border-t border-gray-200">
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center justify-center space-x-2 text-sm hover:bg-blue-50 hover:border-blue-500 transition-colors"
+                    onClick={() => window.location.href = '/laporan'}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    <span>Lihat Detail Arus Kas</span>
+                  </Button>
                 </div>
               </CardContent>
             </Card>

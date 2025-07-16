@@ -137,3 +137,11 @@ The architecture supports a complete rice mill operation with real-time inventor
   - Financial analysis showing costs, potential revenue, and profit/loss
   - Visual status indicators (✅ Profit / ❌ Loss / ⚖️ Break-even) with color coding
   - Frontend-only calculation without backend API dependency
+- **Weekly Cash Flow Panel**: Added comprehensive cash flow tracking dashboard
+  - Real-time calculation of weekly income vs expenses based on all transactions
+  - Shows initial capital (default 50M), weekly income, weekly expenses, and final balance
+  - Visual status indicators (🟢 Profit / 🔴 Loss / ⚖️ Break-even) with color coding
+  - Interactive line chart showing 7-day trend of income vs expenses using Recharts
+  - Separate calculation helper (`cashFlowCalculator.js`) for clean code organization
+  - "Lihat Detail Arus Kas" button linking to detailed reports
+  - Integrates data from sales (penjualan), purchases (pembelian), and expenses (pengeluaran)
