@@ -30,7 +30,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/suppliers", async (req, res) => {
     try {
       const suppliers = await storage.getAllSuppliers();
-      res.json(suppliers);
+      
+      // Add sample data if empty
+      if (suppliers.length === 0) {
+        const sampleSuppliers = [
+          {
+            name: "Toko Tani Sejahtera",
+            address: "Jl. Sawah No. 123, Desa Padi",
+            phone: "081234567890"
+          },
+          {
+            name: "CV. Gabah Makmur", 
+            address: "Jl. Pertanian No. 456, Kec. Subur",
+            phone: "081234567891"
+          }
+        ];
+        
+        for (const supplier of sampleSuppliers) {
+          await storage.createSupplier(supplier);
+        }
+        
+        const newSuppliers = await storage.getAllSuppliers();
+        res.json(newSuppliers);
+      } else {
+        res.json(suppliers);
+      }
     } catch (error) {
       console.error("Error fetching suppliers:", error);
       res.status(500).json({ message: "Failed to fetch suppliers" });
@@ -89,7 +113,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/customers", async (req, res) => {
     try {
       const customers = await storage.getAllCustomers();
-      res.json(customers);
+      
+      // Add sample data if empty
+      if (customers.length === 0) {
+        const sampleCustomers = [
+          {
+            name: "Warung Pak Budi",
+            address: "Jl. Pasar No. 789, Kelurahan Ramai",
+            phone: "081234567892"
+          },
+          {
+            name: "Toko Beras Sari",
+            address: "Jl. Beras No. 101, Kota Sejahtera",
+            phone: "081234567893"
+          }
+        ];
+        
+        for (const customer of sampleCustomers) {
+          await storage.createCustomer(customer);
+        }
+        
+        const newCustomers = await storage.getAllCustomers();
+        res.json(newCustomers);
+      } else {
+        res.json(customers);
+      }
     } catch (error) {
       console.error("Error fetching customers:", error);
       res.status(500).json({ message: "Failed to fetch customers" });
@@ -111,7 +159,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/pembelian", async (req, res) => {
     try {
       const pembelian = await storage.getAllPembelian();
-      res.json(pembelian);
+      
+      // Add sample data if empty
+      if (pembelian.length === 0) {
+        const suppliers = await storage.getAllSuppliers();
+        if (suppliers.length > 0) {
+          const samplePembelian = [
+            {
+              supplierId: suppliers[0].id,
+              tanggal: new Date('2024-01-15'),
+              jenisGabah: "Gabah Premium",
+              jenisBarang: "gabah",
+              jumlah: "1000",
+              hargaPerKg: "8000",
+              totalHarga: "8000000",
+              kadarAir: "12",
+              kualitas: "A",
+              status: "completed",
+              catatan: "Kualitas bagus, pengiriman tepat waktu"
+            },
+            {
+              supplierId: suppliers[1]?.id || suppliers[0].id,
+              tanggal: new Date('2024-01-14'),
+              jenisGabah: "Gabah Medium",
+              jenisBarang: "gabah",
+              jumlah: "500",
+              hargaPerKg: "7500",
+              totalHarga: "3750000",
+              kadarAir: "14",
+              kualitas: "B",
+              status: "completed",
+              catatan: "Standar"
+            }
+          ];
+          
+          for (const item of samplePembelian) {
+            await storage.createPembelian(item);
+          }
+        }
+        
+        const newPembelian = await storage.getAllPembelian();
+        res.json(newPembelian);
+      } else {
+        res.json(pembelian);
+      }
     } catch (error) {
       console.error("Error fetching pembelian:", error);
       res.status(500).json({ message: "Failed to fetch pembelian" });
@@ -200,7 +291,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/penjualan", async (req, res) => {
     try {
       const penjualan = await storage.getAllPenjualan();
-      res.json(penjualan);
+      
+      // Add sample data if empty
+      if (penjualan.length === 0) {
+        const customers = await storage.getAllCustomers();
+        if (customers.length > 0) {
+          const samplePenjualan = [
+            {
+              customerId: customers[0].id,
+              tanggal: new Date('2024-01-16'),
+              jenisBeras: "Beras Premium",
+              jenisBarang: "beras",
+              jumlah: "50",
+              hargaPerKg: "15000",
+              totalHarga: "750000",
+              status: "completed",
+              catatan: "Pelanggan reguler"
+            },
+            {
+              customerId: customers[1]?.id || customers[0].id,
+              tanggal: new Date('2024-01-15'),
+              jenisBeras: "Beras Medium",
+              jenisBarang: "beras",
+              jumlah: "100",
+              hargaPerKg: "12000",
+              totalHarga: "1200000",
+              status: "completed",
+              catatan: "Pesanan besar"
+            }
+          ];
+          
+          for (const item of samplePenjualan) {
+            await storage.createPenjualan(item);
+          }
+        }
+        
+        const newPenjualan = await storage.getAllPenjualan();
+        res.json(newPenjualan);
+      } else {
+        res.json(penjualan);
+      }
     } catch (error) {
       console.error("Error fetching penjualan:", error);
       res.status(500).json({ message: "Failed to fetch penjualan" });
