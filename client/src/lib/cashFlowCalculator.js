@@ -19,9 +19,9 @@ export function calculateWeeklyCashFlow(penjualan = [], pembelian = [], pengelua
   const weeklyPengeluaran = pengeluaran.filter(item => new Date(item.tanggal) >= weekStart);
   
   // Calculate totals
-  const totalPemasukan = weeklyPenjualan.reduce((sum, item) => sum + (item.harga_total || 0), 0);
-  const totalPembelian = weeklyPembelian.reduce((sum, item) => sum + (item.harga_total || 0), 0);
-  const totalPengeluaran = weeklyPengeluaran.reduce((sum, item) => sum + (item.jumlah || 0), 0);
+  const totalPemasukan = weeklyPenjualan.reduce((sum, item) => sum + (parseFloat(item.totalHarga) || 0), 0);
+  const totalPembelian = weeklyPembelian.reduce((sum, item) => sum + (parseFloat(item.totalHarga) || 0), 0);
+  const totalPengeluaran = weeklyPengeluaran.reduce((sum, item) => sum + (parseFloat(item.jumlah) || 0), 0);
   
   const totalKeluar = totalPembelian + totalPengeluaran;
   const saldoAkhir = modalAwal + totalPemasukan - totalKeluar;
@@ -47,8 +47,8 @@ export function calculateWeeklyCashFlow(penjualan = [], pembelian = [], pengelua
   
   return {
     modalAwal,
-    totalPemasukan,
-    totalKeluar,
+    pemasukan: totalPemasukan,
+    pengeluaran: totalKeluar,
     saldoAkhir,
     netFlow,
     status,
@@ -86,9 +86,9 @@ export function generateDailyCashFlowData(penjualan = [], pembelian = [], pengel
     );
     
     // Calculate daily totals
-    const pemasukan = dailyPenjualan.reduce((sum, item) => sum + (item.harga_total || 0), 0);
-    const pembelianTotal = dailyPembelian.reduce((sum, item) => sum + (item.harga_total || 0), 0);
-    const pengeluaranTotal = dailyPengeluaran.reduce((sum, item) => sum + (item.jumlah || 0), 0);
+    const pemasukan = dailyPenjualan.reduce((sum, item) => sum + (parseFloat(item.totalHarga) || 0), 0);
+    const pembelianTotal = dailyPembelian.reduce((sum, item) => sum + (parseFloat(item.totalHarga) || 0), 0);
+    const pengeluaranTotal = dailyPengeluaran.reduce((sum, item) => sum + (parseFloat(item.jumlah) || 0), 0);
     const pengeluaranDay = pembelianTotal + pengeluaranTotal;
     
     days.push({

@@ -69,7 +69,7 @@ export default function Dashboard() {
   const [simulationResult, setSimulationResult] = useState<any>(null);
 
   // Calculate cash flow data
-  const cashFlowData = calculateWeeklyCashFlow(penjualan || [], pembelian || [], pengeluaran || []);
+  const cashFlow = calculateWeeklyCashFlow(penjualan || [], pembelian || [], pengeluaran || []);
   const chartData = generateDailyCashFlowData(penjualan || [], pembelian || [], pengeluaran || []);
 
   // Calculate weekly production trends
@@ -195,12 +195,7 @@ export default function Dashboard() {
     setSimulationResult(null);
   };
 
-  // Calculate cash flow
-  const cashFlow = calculateWeeklyCashFlow(
-    penjualanData || [],
-    pembelianData || [],
-    pengeluaranData || []
-  );
+  // Removed duplicate cashFlow definition
 
   if (isLoading) {
     return (
@@ -689,9 +684,9 @@ export default function Dashboard() {
                 {/* Chart */}
                 <div className="h-32">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={cashFlow.chartData}>
+                    <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="hari" />
+                      <XAxis dataKey="date" />
                       <YAxis />
                       <Tooltip 
                         formatter={(value, name) => [
