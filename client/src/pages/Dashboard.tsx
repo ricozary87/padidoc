@@ -216,7 +216,7 @@ export default function Dashboard() {
                 isPositive: true,
                 label: "dari kemarin"
               }}
-              onClick={() => setLocation("/pembelian-gabah")}
+              onClick={() => setLocation("/pembelian")}
             />
             <MetricsCard
               title="Produksi Hari Ini"

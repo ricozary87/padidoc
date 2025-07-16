@@ -147,7 +147,7 @@ The architecture supports a complete rice mill operation with real-time inventor
   - Integrates data from sales (penjualan), purchases (pembelian), and expenses (pengeluaran)
 - **Clickable Dashboard Panels**: Made all metric cards interactive with navigation
   - Updated MetricsCard component to support onClick handlers with proper hover effects
-  - Added navigation to appropriate pages: Pembelian → /pembelian-gabah, Produksi → /produksi, Penjualan → /penjualan
+  - Added navigation to appropriate pages: Pembelian → /pembelian, Produksi → /produksi, Penjualan → /penjualan
   - All stock-related cards (Stok Beras, Stok Gabah, Stok Katul, Stok Menir, Stok Sekam) navigate to /stok
   - Cards now display cursor pointer and opacity changes on hover to indicate clickability
   - Implemented using wouter's useLocation hook for programmatic navigation
