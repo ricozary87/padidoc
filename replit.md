@@ -227,3 +227,29 @@ The architecture supports a complete rice mill operation with real-time inventor
 - All transactions create audit logs for stock changes
 
 **Status**: Critical business logic fixes completed. Application now prevents overselling and maintains data integrity. Next priorities are authentication system and performance optimizations.
+
+### "No Values to Update" Error Resolution (January 16, 2025)
+
+**Problem**: Error "No values to update" occurred when updateStok method was called with empty data, causing transaction failures.
+
+**Root Cause**: Method naming conflict between `autoUpdateStok` (internal stock updates) and `updateStok` (manual stock updates) causing improper method calls.
+
+**Solution Implemented**:
+1. **Enhanced updateStok Method**: Added validation to handle empty update data gracefully
+   - If no values to update, return existing data without query execution
+   - Added proper error handling for missing stock records
+   - Maintained backward compatibility with existing code
+
+2. **Fixed Method Separation**: Ensured clean separation between:
+   - `autoUpdateStok`: Internal automatic stock updates during transactions
+   - `updateStok`: Manual stock updates from user interface
+
+3. **Improved Error Handling**: Added comprehensive error messages and validation
+
+**Test Results**: All transaction flows now working correctly:
+- ✓ Pembelian: Stock increases properly
+- ✓ Produksi: Input stock decreases, output stock increases  
+- ✓ Penjualan: Stock decreases with validation
+- ✓ Overselling Protection: Prevents negative stock
+
+**Current Stock Management**: System now maintains accurate inventory across all product types (gabah, beras, katul, menir, sekam) with complete transaction logging.

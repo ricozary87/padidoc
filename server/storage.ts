@@ -176,11 +176,10 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date()
       };
       
-      if (Object.keys(updateData).length > 0) {
-        await db.update(stok)
-          .set(updateData)
-          .where(eq(stok.id, existingStock.id));
-      }
+      // PRIORITAS AUDIT - FIXED: Update stok dengan jumlah baru
+      await db.update(stok)
+        .set(updateData)
+        .where(eq(stok.id, existingStock.id));
 
       // Log perubahan stok
       await db.insert(logStok).values({
@@ -525,6 +524,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateStok(id: number, updateStok: Partial<InsertStok>): Promise<Stok> {
+    // PRIORITAS AUDIT - FIXED: Perbaikan untuk mengatasi "No values to update"
+    // Validasi jika tidak ada data untuk diupdate
+    if (!updateStok || Object.keys(updateStok).length === 0) {
+      // Ambil data existing tanpa update jika tidak ada perubahan
+      const [existingItem] = await db.select().from(stok).where(eq(stok.id, id));
+      if (!existingItem) {
+        throw new Error(`Stock with id ${id} not found`);
+      }
+      return existingItem;
+    }
+    
+    // Lakukan update jika ada data
     const [item] = await db.update(stok).set(updateStok).where(eq(stok.id, id)).returning();
     return item;
   }
