@@ -15,15 +15,15 @@ import {
 import { cn } from "@/lib/utils";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: ChartLine },
-  { name: "Pembelian Gabah", href: "/pembelian", icon: ShoppingCart },
-  { name: "Pengeringan", href: "/pengeringan", icon: Sun },
-  { name: "Produksi", href: "/produksi", icon: Package },
-  { name: "Penjualan", href: "/penjualan", icon: DollarSign },
-  { name: "Pengeluaran", href: "/pengeluaran", icon: Receipt },
-  { name: "Stok", href: "/stok", icon: Package },
-  { name: "Laporan", href: "/laporan", icon: BarChart3 },
-  { name: "Pengaturan", href: "/settings", icon: Settings },
+  { name: "Dashboard", href: "/", icon: ChartLine, color: "text-gray-600" },
+  { name: "Pembelian Gabah", href: "/pembelian", icon: ShoppingCart, color: "text-blue-600" },
+  { name: "Pengeringan", href: "/pengeringan", icon: Sun, color: "text-orange-600" },
+  { name: "Produksi", href: "/produksi", icon: Settings, color: "text-green-600" },
+  { name: "Penjualan", href: "/penjualan", icon: DollarSign, color: "text-yellow-500" },
+  { name: "Pengeluaran", href: "/pengeluaran", icon: Receipt, color: "text-red-600" },
+  { name: "Stok", href: "/stok", icon: Package, color: "text-purple-600" },
+  { name: "Laporan", href: "/laporan", icon: BarChart3, color: "text-indigo-600" },
+  { name: "Pengaturan", href: "/settings", icon: Settings, color: "text-gray-600" },
 ];
 
 export default function Sidebar() {
@@ -60,7 +60,7 @@ export default function Sidebar() {
                     : "text-gray-700 hover:bg-gray-100"
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className={cn("h-5 w-5", isActive ? "text-white" : item.color)} />
                 <span>{item.name}</span>
               </a>
             </Link>

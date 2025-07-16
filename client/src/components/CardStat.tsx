@@ -1,29 +1,29 @@
 import { ReactNode } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 
-interface MetricsCardProps {
+interface CardStatProps {
   title: string;
   value: string;
   icon: ReactNode;
+  colorBg?: string;
+  colorText?: string;
   trend?: {
     value: string;
     isPositive: boolean;
     label: string;
   };
-  iconBgColor?: string;
-  colorBg?: string;
-  colorText?: string;
+  subtext?: string;
 }
 
-export default function MetricsCard({ 
+export default function CardStat({ 
   title, 
   value, 
   icon, 
-  trend, 
-  iconBgColor = "bg-blue-100",
   colorBg = "bg-blue-100",
-  colorText = "text-blue-800"
-}: MetricsCardProps) {
+  colorText = "text-blue-800",
+  trend,
+  subtext
+}: CardStatProps) {
   return (
     <Card className={`shadow-md hover:shadow-lg hover:scale-105 transition duration-200 ease-in-out rounded-lg p-4 ${colorBg} ${colorText}`}>
       <CardContent className="p-2">
@@ -31,8 +31,9 @@ export default function MetricsCard({
           <div>
             <p className="text-sm font-medium opacity-80">{title}</p>
             <p className="text-2xl font-bold font-mono">{value}</p>
+            {subtext && <p className="text-xs opacity-70 mt-1">{subtext}</p>}
           </div>
-          <div className={`w-12 h-12 ${iconBgColor} rounded-lg flex items-center justify-center`}>
+          <div className="flex items-center justify-center">
             {icon}
           </div>
         </div>

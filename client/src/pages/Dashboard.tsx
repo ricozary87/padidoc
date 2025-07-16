@@ -95,8 +95,10 @@ export default function Dashboard() {
             <MetricsCard
               title="Pembelian Hari Ini"
               value={`${formatNumber(metrics?.todayPurchases || 0)} kg`}
-              icon={<ShoppingCart className="h-5 w-5 text-primary" />}
+              icon={<ShoppingCart className="h-5 w-5 text-blue-600" />}
               iconBgColor="bg-blue-100"
+              colorBg="bg-blue-100"
+              colorText="text-blue-800"
               trend={{
                 value: "12.5%",
                 isPositive: true,
@@ -106,8 +108,10 @@ export default function Dashboard() {
             <MetricsCard
               title="Produksi Hari Ini"
               value={`${formatNumber(metrics?.todayProduction || 0)} kg`}
-              icon={<Settings className="h-5 w-5 text-secondary" />}
+              icon={<Settings className="h-5 w-5 text-green-600" />}
               iconBgColor="bg-green-100"
+              colorBg="bg-green-100"
+              colorText="text-green-800"
               trend={{
                 value: "8.3%",
                 isPositive: true,
@@ -117,8 +121,10 @@ export default function Dashboard() {
             <MetricsCard
               title="Penjualan Hari Ini"
               value={`${formatNumber(metrics?.todaySales || 0)} kg`}
-              icon={<DollarSign className="h-5 w-5 text-accent" />}
+              icon={<DollarSign className="h-5 w-5 text-yellow-600" />}
               iconBgColor="bg-yellow-100"
+              colorBg="bg-yellow-100"
+              colorText="text-yellow-800"
               trend={{
                 value: "2.1%",
                 isPositive: false,
@@ -130,6 +136,8 @@ export default function Dashboard() {
               value={`${formatNumber(metrics?.stockRice || 0)} kg`}
               icon={<Package className="h-5 w-5 text-purple-600" />}
               iconBgColor="bg-purple-100"
+              colorBg="bg-purple-100"
+              colorText="text-purple-800"
               trend={{
                 value: "Aman",
                 isPositive: true,
@@ -145,24 +153,32 @@ export default function Dashboard() {
               value={`${formatNumber(metrics?.stockGabah || 0)} kg`}
               icon={<Package className="h-5 w-5 text-orange-600" />}
               iconBgColor="bg-orange-100"
+              colorBg="bg-orange-100"
+              colorText="text-orange-800"
             />
             <MetricsCard
               title="Stok Katul"
               value={`${formatNumber(metrics?.stockKatul || 0)} kg`}
-              icon={<Package className="h-5 w-5 text-amber-600" />}
-              iconBgColor="bg-amber-100"
+              icon={<Package className="h-5 w-5 text-yellow-600" />}
+              iconBgColor="bg-yellow-200"
+              colorBg="bg-yellow-200"
+              colorText="text-yellow-900"
             />
             <MetricsCard
               title="Stok Menir"
               value={`${formatNumber(metrics?.stockMenir || 0)} kg`}
-              icon={<Package className="h-5 w-5 text-indigo-600" />}
-              iconBgColor="bg-indigo-100"
+              icon={<Package className="h-5 w-5 text-red-600" />}
+              iconBgColor="bg-red-100"
+              colorBg="bg-red-100"
+              colorText="text-red-800"
             />
             <MetricsCard
               title="Stok Sekam"
               value={`${formatNumber(metrics?.stockSekam || 0)} kg`}
               icon={<Package className="h-5 w-5 text-gray-600" />}
               iconBgColor="bg-gray-100"
+              colorBg="bg-gray-100"
+              colorText="text-gray-700"
             />
           </div>
 
@@ -187,10 +203,10 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                <div className="h-64 flex items-center justify-center bg-slate-100 rounded-lg">
                   <div className="text-center">
-                    <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500">Grafik Trend Produksi</p>
+                    <BarChart3 className="h-12 w-12 text-gray-400 opacity-30 mx-auto mb-2" />
+                    <p className="text-gray-500">Data belum tersedia</p>
                   </div>
                 </div>
               </CardContent>
@@ -213,21 +229,27 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Beras Premium</span>
                     <div className="flex items-center space-x-2">
-                      <Progress value={72} className="w-32" />
+                      <div className="w-32 bg-gray-200 rounded-full h-2.5">
+                        <div className="bg-gradient-to-r from-green-400 to-green-600 h-2.5 rounded-full" style={{width: '72%'}}></div>
+                      </div>
                       <span className="text-sm font-mono text-gray-900">72%</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Beras Medium</span>
                     <div className="flex items-center space-x-2">
-                      <Progress value={65} className="w-32" />
+                      <div className="w-32 bg-gray-200 rounded-full h-2.5">
+                        <div className="bg-gradient-to-r from-green-400 to-green-600 h-2.5 rounded-full" style={{width: '65%'}}></div>
+                      </div>
                       <span className="text-sm font-mono text-gray-900">65%</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Beras Pecah</span>
                     <div className="flex items-center space-x-2">
-                      <Progress value={58} className="w-32" />
+                      <div className="w-32 bg-gray-200 rounded-full h-2.5">
+                        <div className="bg-gradient-to-r from-green-400 to-green-600 h-2.5 rounded-full" style={{width: '58%'}}></div>
+                      </div>
                       <span className="text-sm font-mono text-gray-900">58%</span>
                     </div>
                   </div>

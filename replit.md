@@ -120,3 +120,14 @@ The system manages eight core entities:
 - **Error Handling**: Runtime error overlay for development debugging
 
 The architecture supports a complete rice mill operation with real-time inventory tracking, financial management, and comprehensive reporting capabilities. The system is designed for scalability and maintainability with strong type safety throughout the stack.
+
+## Recent Changes
+
+### Visual Dashboard Enhancements (January 2025)
+- **Enhanced MetricsCard Component**: Added colored backgrounds and text for better visual distinction
+- **Color-coded Statistics Cards**: Each metric now has distinct color scheme (blue for purchases, green for production, yellow for sales, purple for rice stock, orange for grain stock, etc.)
+- **Hover Animations**: Added smooth scale and shadow transitions for metric cards
+- **Gradient Progress Bars**: Replaced standard progress bars with gradient green progress bars for efficiency metrics
+- **Improved Chart Placeholders**: Empty chart areas now use slate background with semi-transparent icons and "Data belum tersedia" text
+- **Colored Sidebar Icons**: Added color-coded icons for navigation menu items matching their respective functions
+- **Created CardStat Component**: Reusable component for future metric cards with standardized styling
