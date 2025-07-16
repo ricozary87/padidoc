@@ -39,24 +39,24 @@ export default function QuickActions() {
 
   return (
     <Card className="shadow-sm border border-gray-200">
-      <CardHeader>
-        <CardTitle className="text-lg font-inter font-semibold text-gray-900">
+      <CardHeader className="p-3 md:p-6">
+        <CardTitle className="text-sm md:text-lg font-inter font-semibold text-gray-900">
           Aksi Cepat
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <CardContent className="p-3 md:p-6">
+        <div className="grid grid-cols-2 gap-2 md:gap-4">
           {quickActions.map((action) => (
             <Button
               key={action.title}
               variant="ghost"
-              className={`p-4 ${action.hoverColor} transition-colors group h-auto flex-col space-y-3`}
+              className={`p-2 md:p-4 ${action.hoverColor} transition-colors group h-auto flex-col space-y-1 md:space-y-3 w-full`}
               onClick={() => setLocation(action.href)}
             >
-              <div className={`w-12 h-12 ${action.bgColor} rounded-lg flex items-center justify-center mx-auto group-hover:scale-105 transition-transform`}>
+              <div className={`w-10 h-10 md:w-12 md:h-12 ${action.bgColor} rounded-lg flex items-center justify-center mx-auto group-hover:scale-105 transition-transform`}>
                 {action.icon}
               </div>
-              <p className="text-sm font-medium text-gray-900">{action.title}</p>
+              <p className="text-xs md:text-sm font-medium text-gray-900 text-center">{action.title}</p>
             </Button>
           ))}
         </div>

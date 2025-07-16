@@ -81,22 +81,23 @@ export default function DataTable({
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white rounded-lg p-3 md:p-6 shadow-sm border border-gray-200">
+      <div className="flex items-center justify-between mb-3 md:mb-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
             placeholder="Cari data..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-sm"
           />
         </div>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
             {columns.map((column) => (
               <TableHead
                 key={column.key}
@@ -119,14 +120,15 @@ export default function DataTable({
               ))}
               {(onEdit || onDelete) && (
                 <TableCell>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-1 md:space-x-2">
                     {onEdit && (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => onEdit(row)}
+                        className="p-1 md:p-2"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-3 h-3 md:w-4 md:h-4" />
                       </Button>
                     )}
                     {onDelete && (
@@ -134,8 +136,9 @@ export default function DataTable({
                         variant="outline"
                         size="sm"
                         onClick={() => onDelete(row)}
+                        className="p-1 md:p-2"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
                       </Button>
                     )}
                   </div>
@@ -145,9 +148,10 @@ export default function DataTable({
           ))}
         </TableBody>
       </Table>
+      </div>
 
       {sortedData.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-6 md:py-8 text-gray-500 text-sm md:text-base">
           Tidak ada data yang ditemukan
         </div>
       )}

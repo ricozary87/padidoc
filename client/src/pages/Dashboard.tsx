@@ -200,19 +200,19 @@ export default function Dashboard() {
       <Sidebar />
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+        <header className="bg-white shadow-sm border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-inter font-bold text-gray-900">Dashboard</h2>
-              <p className="text-sm text-gray-500">Selamat datang kembali, pantau aktivitas penggilingan Anda</p>
+            <div className="flex-1 mr-4">
+              <h2 className="text-lg md:text-2xl font-inter font-bold text-gray-900">Dashboard</h2>
+              <p className="text-xs md:text-sm text-gray-500 truncate">Selamat datang kembali, pantau aktivitas penggilingan Anda</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-4">
               <div className="relative">
-                <Bell className="h-5 w-5 text-gray-400 cursor-pointer hover:text-gray-600" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                <Bell className="h-4 w-4 md:h-5 md:w-5 text-gray-400 cursor-pointer hover:text-gray-600" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 md:w-3 md:h-3 bg-red-500 rounded-full"></span>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">{formatDate()}</p>
+              <div className="text-right hidden sm:block">
+                <p className="text-xs md:text-sm font-medium text-gray-900">{formatDate()}</p>
                 <p className="text-xs text-gray-500">Hari ini</p>
               </div>
             </div>
@@ -220,9 +220,12 @@ export default function Dashboard() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 p-6 space-y-4">
+        <main className="flex-1 p-3 md:p-6 space-y-3 md:space-y-4 overflow-y-auto lg:pl-0">
+          {/* Add padding on mobile for hamburger button */}
+          <div className="lg:hidden h-12"></div>
+          
           {/* Metrics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <MetricsCard
               title="Pembelian Hari Ini"
               value={`${formatNumber(metrics?.todayPurchases || 0)} kg`}
@@ -282,7 +285,7 @@ export default function Dashboard() {
           </div>
 
           {/* UPDATE INI UNTUK MULTI PRODUK - Stock untuk jenis barang lainnya */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <MetricsCard
               title="Stok Gabah"
               value={`${formatNumber(metrics?.stockGabah || 0)} kg`}
@@ -322,15 +325,15 @@ export default function Dashboard() {
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
             <Card className="shadow-sm border border-gray-200">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-inter font-semibold text-gray-900">
+              <CardHeader className="p-3 md:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <CardTitle className="text-sm md:text-lg font-inter font-semibold text-gray-900">
                     Trend Produksi Mingguan
                   </CardTitle>
                   <Select defaultValue="7">
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="w-full sm:w-40">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -341,29 +344,29 @@ export default function Dashboard() {
                   </Select>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-center justify-center bg-slate-100 rounded-lg">
+              <CardContent className="p-3 md:p-6">
+                <div className="h-48 md:h-64 flex items-center justify-center bg-slate-100 rounded-lg">
                   <div className="text-center">
-                    <BarChart3 className="h-12 w-12 text-gray-400 opacity-30 mx-auto mb-2" />
-                    <p className="text-gray-500">Data belum tersedia</p>
+                    <BarChart3 className="h-10 w-10 md:h-12 md:w-12 text-gray-400 opacity-30 mx-auto mb-2" />
+                    <p className="text-sm md:text-base text-gray-500">Data belum tersedia</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="shadow-sm border border-gray-200">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-inter font-semibold text-gray-900">
+              <CardHeader className="p-3 md:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <CardTitle className="text-sm md:text-lg font-inter font-semibold text-gray-900">
                     Efisiensi Rendemen
                   </CardTitle>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">Target: 65%</span>
-                    <span className="text-sm font-medium text-green-600">67.8%</span>
+                    <span className="text-xs md:text-sm text-gray-500">Target: 65%</span>
+                    <span className="text-xs md:text-sm font-medium text-green-600">67.8%</span>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 md:space-y-4 p-3 md:p-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Beras Premium</span>

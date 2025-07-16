@@ -181,18 +181,18 @@ export default function Pengeluaran() {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
       <div className="flex-1 flex flex-col">
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
+        <header className="bg-white shadow-sm border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center space-x-3">
-              <Receipt className="h-6 w-6 text-red-600" />
+              <Receipt className="h-5 w-5 md:h-6 md:w-6 text-red-600 flex-shrink-0" />
               <div>
-                <h2 className="text-2xl font-inter font-bold text-gray-900">Pengeluaran</h2>
-                <p className="text-sm text-gray-500">Kelola pengeluaran operasional</p>
+                <h2 className="text-xl md:text-2xl font-inter font-bold text-gray-900">Pengeluaran</h2>
+                <p className="text-xs md:text-sm text-gray-500">Kelola pengeluaran operasional</p>
               </div>
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button>
+                <Button className="w-full sm:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Tambah Pengeluaran
                 </Button>
@@ -299,11 +299,16 @@ export default function Pengeluaran() {
           </div>
         </header>
 
-        <main className="flex-1 p-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Daftar Pengeluaran</CardTitle>
+        <main className="flex-1 p-3 md:p-6 overflow-y-auto">
+          {/* Add padding on mobile for hamburger button */}
+          <div className="lg:hidden h-12"></div>
+          
+          <Card className="shadow-sm border border-gray-200">
+            <CardHeader className="p-3 md:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <CardTitle className="text-base md:text-lg font-inter font-semibold text-gray-900">
+                  Daftar Pengeluaran
+                </CardTitle>
                 <div className="flex items-center space-x-2">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -311,66 +316,70 @@ export default function Pengeluaran() {
                       placeholder="Cari pengeluaran..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 w-64"
+                      className="pl-10 w-full sm:w-64 text-sm"
                     />
                   </div>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tanggal</TableHead>
-                    <TableHead>Kategori</TableHead>
-                    <TableHead>Deskripsi</TableHead>
-                    <TableHead>Jumlah</TableHead>
-                    <TableHead>Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
+            <CardContent className="p-0 md:p-6">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center">Loading...</TableCell>
+                      <TableHead className="text-xs md:text-sm">Tanggal</TableHead>
+                      <TableHead className="text-xs md:text-sm">Kategori</TableHead>
+                      <TableHead className="text-xs md:text-sm">Deskripsi</TableHead>
+                      <TableHead className="text-xs md:text-sm">Jumlah</TableHead>
+                      <TableHead className="text-xs md:text-sm">Aksi</TableHead>
                     </TableRow>
-                  ) : filteredPengeluaran?.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center">Belum ada data pengeluaran</TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredPengeluaran?.map((item: any) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{formatDate(item.tanggal)}</TableCell>
-                        <TableCell>
-                          <Badge className={getCategoryColor(item.kategori)}>
-                            {item.kategori}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{item.deskripsi}</TableCell>
-                        <TableCell>{formatCurrency(item.jumlah)}</TableCell>
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleEdit(item)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleDelete(item.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center text-sm">Loading...</TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+                    ) : filteredPengeluaran?.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center text-sm">Belum ada data pengeluaran</TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredPengeluaran?.map((item: any) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="text-xs md:text-sm">{formatDate(item.tanggal)}</TableCell>
+                          <TableCell>
+                            <Badge className={`text-xs ${getCategoryColor(item.kategori)}`}>
+                              {item.kategori}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-xs md:text-sm">{item.deskripsi}</TableCell>
+                          <TableCell className="text-xs md:text-sm">{formatCurrency(item.jumlah)}</TableCell>
+                          <TableCell>
+                            <div className="flex space-x-1">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEdit(item)}
+                                className="p-1 md:p-2"
+                              >
+                                <Edit className="h-3 w-3 md:h-4 md:w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDelete(item.id)}
+                                className="p-1 md:p-2"
+                              >
+                                <Trash2 className="h-3 w-3 md:h-4 md:w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </main>

@@ -78,36 +78,36 @@ export default function RecentActivities({ transactions }: RecentActivitiesProps
 
   return (
     <Card className="shadow-sm border border-gray-200">
-      <CardHeader>
+      <CardHeader className="p-3 md:p-6">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-inter font-semibold text-gray-900 flex items-center space-x-2">
-            <History className="h-5 w-5 text-blue-600" />
+          <CardTitle className="text-base md:text-lg font-inter font-semibold text-gray-900 flex items-center space-x-2">
+            <History className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
             <span>Riwayat Transaksi</span>
           </CardTitle>
-          <Button variant="ghost" size="sm" className="text-primary hover:text-blue-700">
+          <Button variant="ghost" size="sm" className="text-primary hover:text-blue-700 text-xs md:text-sm">
             Lihat Semua
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 p-3 md:p-6 pt-0 md:pt-0">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
         ) : (allTransactions || transactions)?.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">Belum ada transaksi</p>
+          <p className="text-gray-500 text-center py-4 text-sm">Belum ada transaksi</p>
         ) : (
           (allTransactions || transactions)?.slice(0, 10).map((transaction) => (
-            <div key={transaction.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-              <div className={`w-10 h-10 ${getIconBgColor(transaction.type)} rounded-full flex items-center justify-center`}>
+            <div key={transaction.id} className="flex items-center space-x-2 md:space-x-4 p-3 md:p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div className={`w-8 h-8 md:w-10 md:h-10 ${getIconBgColor(transaction.type)} rounded-full flex items-center justify-center flex-shrink-0`}>
                 {getIcon(transaction.type)}
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">{transaction.description}</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs md:text-sm font-medium text-gray-900 truncate">{transaction.description}</p>
                 <p className="text-xs text-gray-500">{formatDate(transaction.date)}</p>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-mono text-gray-900">{transaction.amount} kg</p>
+              <div className="text-right flex-shrink-0">
+                <p className="text-xs md:text-sm font-mono text-gray-900">{transaction.amount} kg</p>
                 <p className="text-xs text-gray-500">{formatCurrency(transaction.value)}</p>
               </div>
             </div>

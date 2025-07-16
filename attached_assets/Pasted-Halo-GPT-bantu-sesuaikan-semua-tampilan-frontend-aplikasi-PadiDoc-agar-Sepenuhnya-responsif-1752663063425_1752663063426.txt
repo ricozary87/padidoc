@@ -1,0 +1,49 @@
+Halo GPT, bantu sesuaikan semua tampilan frontend aplikasi PadiDoc agar:
+
+✅ Sepenuhnya **responsif** (bisa dibuka di HP dan PC)  
+✅ **Tidak mengubah struktur UI dan fitur yang sudah ada**  
+✅ Menggunakan Tailwind CSS untuk optimasi ukuran & layout antar device
+
+🎯 Target:
+- Semua halaman seperti Dashboard, Pembelian, Produksi, Penjualan, dll
+- Harus tampil rapi di layar kecil (HP) maupun besar (PC/Laptop)
+
+✅ Checklist yang harus kamu pastikan:
+
+1. **Layout Grid Responsif**
+   - Gunakan Tailwind seperti `grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4`
+   - Untuk barisan kartu metrik di dashboard, supaya menyesuaikan layar
+
+2. **Teks dan Padding Responsif**
+   - Gunakan `text-sm md:text-base`, `p-2 md:p-4`, `gap-2 md:gap-4`
+   - Biar enak dibaca di HP dan tetap proporsional di PC
+
+3. **Sidebar**
+   - Jika sidebar tidak responsif, ubah agar bisa:
+     - Collapse otomatis di layar kecil
+     - Atau diganti jadi drawer/slide (boleh pakai Tailwind UI atau buatan sendiri)
+
+4. **Table & Scroll**
+   - Tambahkan `overflow-x-auto` pada semua tabel
+   - Tambahkan container/table wrapper `max-w-full` agar tabel tidak kepotong di HP
+
+5. **Tombol Aksi**
+   - Tambahkan `w-full` untuk tombol di mobile agar mudah ditekan
+   - Gunakan `text-sm md:text-base` dan `rounded-md shadow-sm` untuk kenyamanan UI
+
+6. **Chart Responsif**
+   - Pastikan chart seperti Chart.js diberi container `w-full h-[300px]` dan skalanya adaptif
+
+7. **Responsif pada Modal dan Form**
+   - Pastikan semua modal/input form bisa tampil penuh di layar kecil
+   - Gunakan `max-w-md mx-auto` + `w-[90%]` untuk centering
+
+8. **Tidak mengubah logika data atau state yang sudah ada.**  
+   Fokus 100% hanya pada tampilan dan kenyamanan pengguna HP dan PC.
+
+Setelah selesai, pastikan:
+- Bisa dibuka dengan nyaman di layar 375px (iPhone), 768px (tablet), dan >1024px (desktop)
+- Semua komponen penting tetap terlihat jelas
+- UI tidak perlu scroll ke samping (kecuali tabel panjang)
+
+Terima kasih!
