@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { Bell, ShoppingCart, Settings, DollarSign, Package, BarChart3 } from "lucide-react";
+import { useState } from "react";
+import { Bell, ShoppingCart, Settings, DollarSign, Package, BarChart3, Calculator, Plus, CheckCircle, XCircle, Scale } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import MetricsCard from "@/components/MetricsCard";
 import RecentActivities from "@/components/RecentActivities";
@@ -8,14 +9,39 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function Dashboard() {
   const { data: metrics, isLoading } = useQuery({
     queryKey: ["/api/dashboard/metrics"],
   });
 
+  // Simulation state
+  const [isSimulationOpen, setIsSimulationOpen] = useState(false);
+  const [simulationData, setSimulationData] = useState({
+    beratGabah: "",
+    hargaBeliGabah: "",
+    hargaJualBeras: "",
+    hargaJualKatul: "",
+    hargaJualMenir: "",
+    rendemenBeras: "55",
+    rendemenKatul: "20",
+    rendemenSekam: "15"
+  });
+  const [simulationResult, setSimulationResult] = useState<any>(null);
+
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('id-ID').format(num);
+  };
+
+  const formatCurrency = (num: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR'
+    }).format(num);
   };
 
   const formatDate = () => {
@@ -26,6 +52,70 @@ export default function Dashboard() {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const calculateSimulation = () => {
+    const beratGabah = parseFloat(simulationData.beratGabah);
+    const hargaBeliGabah = parseFloat(simulationData.hargaBeliGabah);
+    const hargaJualBeras = parseFloat(simulationData.hargaJualBeras);
+    const hargaJualKatul = parseFloat(simulationData.hargaJualKatul);
+    const hargaJualMenir = parseFloat(simulationData.hargaJualMenir) || 0;
+    const rendemenBeras = parseFloat(simulationData.rendemenBeras);
+    const rendemenKatul = parseFloat(simulationData.rendemenKatul);
+    const rendemenSekam = parseFloat(simulationData.rendemenSekam);
+
+    // Calculate production results
+    const beratBeras = beratGabah * (rendemenBeras / 100);
+    const beratKatul = beratGabah * (rendemenKatul / 100);
+    const beratMenir = beratGabah * (rendemenSekam / 100);
+    const beratSekam = beratGabah * (rendemenSekam / 100);
+
+    // Calculate costs and revenue
+    const biayaGabah = beratGabah * hargaBeliGabah;
+    const pemasukan = (beratBeras * hargaJualBeras) + (beratKatul * hargaJualKatul) + (beratMenir * hargaJualMenir);
+    const keuntungan = pemasukan - biayaGabah;
+
+    // Determine status
+    let status = "BEP";
+    let statusColor = "text-yellow-600";
+    let statusIcon = Scale;
+    
+    if (keuntungan > 0) {
+      status = "Untung";
+      statusColor = "text-green-600";
+      statusIcon = CheckCircle;
+    } else if (keuntungan < 0) {
+      status = "Rugi";
+      statusColor = "text-red-600";
+      statusIcon = XCircle;
+    }
+
+    setSimulationResult({
+      beratBeras,
+      beratKatul,
+      beratMenir,
+      beratSekam,
+      biayaGabah,
+      pemasukan,
+      keuntungan,
+      status,
+      statusColor,
+      statusIcon
+    });
+  };
+
+  const resetSimulation = () => {
+    setSimulationData({
+      beratGabah: "",
+      hargaBeliGabah: "",
+      hargaJualBeras: "",
+      hargaJualKatul: "",
+      hargaJualMenir: "",
+      rendemenBeras: "55",
+      rendemenKatul: "20",
+      rendemenSekam: "15"
+    });
+    setSimulationResult(null);
   };
 
   if (isLoading) {
@@ -253,6 +343,196 @@ export default function Dashboard() {
                       <span className="text-sm font-mono text-gray-900">58%</span>
                     </div>
                   </div>
+                </div>
+                
+                {/* Simulation Button */}
+                <div className="pt-4 border-t border-gray-200">
+                  <Dialog open={isSimulationOpen} onOpenChange={setIsSimulationOpen}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="w-full flex items-center justify-center space-x-2 hover:bg-green-50 hover:border-green-500 transition-colors"
+                        onClick={() => resetSimulation()}
+                      >
+                        <Plus className="h-4 w-4" />
+                        <span>Simulasi Rendemen</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle className="flex items-center space-x-2">
+                          <Calculator className="h-5 w-5 text-green-600" />
+                          <span>Simulasi Rendemen Gabah</span>
+                        </DialogTitle>
+                      </DialogHeader>
+                      
+                      <div className="space-y-6">
+                        {/* Input Form */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="beratGabah">Berat Gabah (kg)</Label>
+                            <Input
+                              id="beratGabah"
+                              type="number"
+                              placeholder="100"
+                              value={simulationData.beratGabah}
+                              onChange={(e) => setSimulationData({...simulationData, beratGabah: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="hargaBeliGabah">Harga Beli Gabah (/kg)</Label>
+                            <Input
+                              id="hargaBeliGabah"
+                              type="number"
+                              placeholder="5000"
+                              value={simulationData.hargaBeliGabah}
+                              onChange={(e) => setSimulationData({...simulationData, hargaBeliGabah: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="hargaJualBeras">Harga Jual Beras (/kg)</Label>
+                            <Input
+                              id="hargaJualBeras"
+                              type="number"
+                              placeholder="12000"
+                              value={simulationData.hargaJualBeras}
+                              onChange={(e) => setSimulationData({...simulationData, hargaJualBeras: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="hargaJualKatul">Harga Jual Katul (/kg)</Label>
+                            <Input
+                              id="hargaJualKatul"
+                              type="number"
+                              placeholder="3000"
+                              value={simulationData.hargaJualKatul}
+                              onChange={(e) => setSimulationData({...simulationData, hargaJualKatul: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="hargaJualMenir">Harga Jual Menir (/kg) - Opsional</Label>
+                            <Input
+                              id="hargaJualMenir"
+                              type="number"
+                              placeholder="8000"
+                              value={simulationData.hargaJualMenir}
+                              onChange={(e) => setSimulationData({...simulationData, hargaJualMenir: e.target.value})}
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Yield Percentages */}
+                        <div className="space-y-4">
+                          <h4 className="font-medium text-gray-900">Persentase Rendemen</h4>
+                          <div className="grid grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="rendemenBeras">Beras (%)</Label>
+                              <Input
+                                id="rendemenBeras"
+                                type="number"
+                                value={simulationData.rendemenBeras}
+                                onChange={(e) => setSimulationData({...simulationData, rendemenBeras: e.target.value})}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="rendemenKatul">Katul (%)</Label>
+                              <Input
+                                id="rendemenKatul"
+                                type="number"
+                                value={simulationData.rendemenKatul}
+                                onChange={(e) => setSimulationData({...simulationData, rendemenKatul: e.target.value})}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="rendemenSekam">Sekam (%)</Label>
+                              <Input
+                                id="rendemenSekam"
+                                type="number"
+                                value={simulationData.rendemenSekam}
+                                onChange={(e) => setSimulationData({...simulationData, rendemenSekam: e.target.value})}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Calculate Button */}
+                        <Button 
+                          onClick={calculateSimulation}
+                          className="w-full bg-green-600 hover:bg-green-700"
+                          disabled={!simulationData.beratGabah || !simulationData.hargaBeliGabah || !simulationData.hargaJualBeras || !simulationData.hargaJualKatul}
+                        >
+                          <Calculator className="h-4 w-4 mr-2" />
+                          Hitung Simulasi
+                        </Button>
+                        
+                        {/* Results */}
+                        {simulationResult && (
+                          <div className="space-y-4 border-t pt-4">
+                            <h4 className="font-medium text-gray-900">Hasil Simulasi</h4>
+                            
+                            {/* Production Results */}
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <h5 className="text-sm font-medium text-gray-700">Hasil Produksi</h5>
+                                <div className="space-y-1 text-sm">
+                                  <div className="flex justify-between">
+                                    <span>Beras:</span>
+                                    <span className="font-mono">{formatNumber(simulationResult.beratBeras)} kg</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Katul:</span>
+                                    <span className="font-mono">{formatNumber(simulationResult.beratKatul)} kg</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Menir:</span>
+                                    <span className="font-mono">{formatNumber(simulationResult.beratMenir)} kg</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Sekam:</span>
+                                    <span className="font-mono">{formatNumber(simulationResult.beratSekam)} kg</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <h5 className="text-sm font-medium text-gray-700">Analisis Keuangan</h5>
+                                <div className="space-y-1 text-sm">
+                                  <div className="flex justify-between">
+                                    <span>Biaya Gabah:</span>
+                                    <span className="font-mono text-red-600">{formatCurrency(simulationResult.biayaGabah)}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Potensi Pemasukan:</span>
+                                    <span className="font-mono text-green-600">{formatCurrency(simulationResult.pemasukan)}</span>
+                                  </div>
+                                  <div className="flex justify-between border-t pt-1">
+                                    <span className="font-medium">Keuntungan/Rugi:</span>
+                                    <span className={`font-mono font-bold ${simulationResult.keuntungan >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                      {formatCurrency(simulationResult.keuntungan)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Status */}
+                            <div className={`p-4 rounded-lg border-2 ${
+                              simulationResult.status === 'Untung' ? 'bg-green-50 border-green-200' :
+                              simulationResult.status === 'Rugi' ? 'bg-red-50 border-red-200' :
+                              'bg-yellow-50 border-yellow-200'
+                            }`}>
+                              <div className="flex items-center space-x-2">
+                                <simulationResult.statusIcon className={`h-5 w-5 ${simulationResult.statusColor}`} />
+                                <span className={`font-bold ${simulationResult.statusColor}`}>
+                                  Kesimpulan: {simulationResult.status}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardContent>
             </Card>

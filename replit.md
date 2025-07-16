@@ -131,3 +131,9 @@ The architecture supports a complete rice mill operation with real-time inventor
 - **Improved Chart Placeholders**: Empty chart areas now use slate background with semi-transparent icons and "Data belum tersedia" text
 - **Colored Sidebar Icons**: Added color-coded icons for navigation menu items matching their respective functions
 - **Created CardStat Component**: Reusable component for future metric cards with standardized styling
+- **Grain Yield Simulation Feature**: Added comprehensive yield simulation tool in Dashboard
+  - Interactive modal with form inputs for grain weight, purchase/sale prices, and yield percentages
+  - Real-time calculation of production results (rice, bran, broken rice, husk)
+  - Financial analysis showing costs, potential revenue, and profit/loss
+  - Visual status indicators (✅ Profit / ❌ Loss / ⚖️ Break-even) with color coding
+  - Frontend-only calculation without backend API dependency
