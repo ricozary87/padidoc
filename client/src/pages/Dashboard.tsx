@@ -24,6 +24,18 @@ export default function Dashboard() {
     queryKey: ["/api/dashboard/metrics"],
   });
 
+  const { data: penjualanData } = useQuery({
+    queryKey: ["/api/penjualan"],
+  });
+
+  const { data: pembelianData } = useQuery({
+    queryKey: ["/api/pembelian"],
+  });
+
+  const { data: pengeluaranData } = useQuery({
+    queryKey: ["/api/pengeluaran"],
+  });
+
   // Fetch transaction data for cash flow calculations
   const { data: penjualan } = useQuery({
     queryKey: ["/api/penjualan"],
@@ -140,6 +152,13 @@ export default function Dashboard() {
     setSimulationResult(null);
   };
 
+  // Calculate cash flow
+  const cashFlow = calculateWeeklyCashFlow(
+    penjualanData || [],
+    pembelianData || [],
+    pengeluaranData || []
+  );
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-gray-50">
@@ -201,9 +220,9 @@ export default function Dashboard() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 p-6 space-y-6">
+        <main className="flex-1 p-6 space-y-4">
           {/* Metrics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <MetricsCard
               title="Pembelian Hari Ini"
               value={`${formatNumber(metrics?.todayPurchases || 0)} kg`}
@@ -263,7 +282,7 @@ export default function Dashboard() {
           </div>
 
           {/* UPDATE INI UNTUK MULTI PRODUK - Stock untuk jenis barang lainnya */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <MetricsCard
               title="Stok Gabah"
               value={`${formatNumber(metrics?.stockGabah || 0)} kg`}
@@ -303,7 +322,7 @@ export default function Dashboard() {
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card className="shadow-sm border border-gray-200">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -676,11 +695,102 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          {/* Recent Activities and Schedule */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <RecentActivities transactions={metrics?.recentTransactions || []} />
-            </div>
+          {/* Arus Kas Mingguan dan Jadwal Pengeringan */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="shadow-sm border border-gray-200">
+              <CardHeader>
+                <CardTitle className="text-lg font-inter font-semibold text-gray-900">
+                  Arus Kas Mingguan
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Weekly Overview */}
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="text-center p-3 bg-blue-50 rounded-lg">
+                    <p className="text-xs text-gray-500">Modal Awal</p>
+                    <p className="text-sm font-semibold text-blue-600">{formatCurrency(cashFlow.modalAwal)}</p>
+                  </div>
+                  <div className="text-center p-3 bg-green-50 rounded-lg">
+                    <p className="text-xs text-gray-500">Pemasukan</p>
+                    <p className="text-sm font-semibold text-green-600">{formatCurrency(cashFlow.pemasukan)}</p>
+                  </div>
+                  <div className="text-center p-3 bg-red-50 rounded-lg">
+                    <p className="text-xs text-gray-500">Pengeluaran</p>
+                    <p className="text-sm font-semibold text-red-600">{formatCurrency(cashFlow.pengeluaran)}</p>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <p className="text-xs text-gray-500">Saldo Akhir</p>
+                    <p className={`text-sm font-semibold ${cashFlow.saldoAkhir >= cashFlow.modalAwal ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatCurrency(cashFlow.saldoAkhir)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Status Indikator */}
+                <div className="flex items-center justify-center space-x-2 p-3 rounded-lg bg-gray-50">
+                  <span className="text-lg">
+                    {cashFlow.status === 'profit' ? '🟢' : cashFlow.status === 'loss' ? '🔴' : '⚖️'}
+                  </span>
+                  <span className={`font-medium ${
+                    cashFlow.status === 'profit' ? 'text-green-600' : 
+                    cashFlow.status === 'loss' ? 'text-red-600' : 'text-gray-600'
+                  }`}>
+                    {cashFlow.status === 'profit' ? 'Profit' : 
+                     cashFlow.status === 'loss' ? 'Loss' : 'Break-even'}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {cashFlow.status === 'profit' ? 
+                      `+${formatCurrency(cashFlow.saldoAkhir - cashFlow.modalAwal)}` : 
+                      cashFlow.status === 'loss' ? 
+                      `${formatCurrency(cashFlow.saldoAkhir - cashFlow.modalAwal)}` : 
+                      'Tidak ada untung rugi'}
+                  </span>
+                </div>
+
+                {/* Chart */}
+                <div className="h-32">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={cashFlow.chartData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="hari" />
+                      <YAxis />
+                      <Tooltip 
+                        formatter={(value, name) => [
+                          formatCurrency(value), 
+                          name === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran'
+                        ]}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="pemasukan" 
+                        stroke="#10b981" 
+                        strokeWidth={2}
+                        dot={{ fill: '#10b981', strokeWidth: 2, r: 3 }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="pengeluaran" 
+                        stroke="#ef4444" 
+                        strokeWidth={2}
+                        dot={{ fill: '#ef4444', strokeWidth: 2, r: 3 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Detail Button */}
+                <div className="pt-3 border-t border-gray-200">
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center justify-center space-x-2 text-sm hover:bg-blue-50 hover:border-blue-500 transition-colors"
+                    onClick={() => window.location.href = '/laporan'}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    <span>Lihat Detail Arus Kas</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             <Card className="shadow-sm border border-gray-200">
               <CardHeader>
@@ -706,6 +816,11 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Recent Activities */}
+          <div className="mt-4">
+            <RecentActivities transactions={metrics?.recentTransactions || []} />
           </div>
 
           {/* Quick Actions */}

@@ -151,3 +151,10 @@ The architecture supports a complete rice mill operation with real-time inventor
   - All stock-related cards (Stok Beras, Stok Gabah, Stok Katul, Stok Menir, Stok Sekam) navigate to /stok
   - Cards now display cursor pointer and opacity changes on hover to indicate clickability
   - Implemented using wouter's useLocation hook for programmatic navigation
+- **Dashboard Layout Improvements**: Cleaned up panel spacing and alignment
+  - Reduced main content spacing from `space-y-6` to `space-y-4` for tighter layout
+  - Reduced all grid gaps from `gap-6` to `gap-4` for better visual balance
+  - Created dedicated section for "Arus Kas Mingguan dan Jadwal Pengeringan" alignment
+  - Restructured layout with proper side-by-side alignment of key panels
+  - Moved Recent Activities to its own dedicated section
+  - Fixed responsive layout for better mobile and tablet viewing
