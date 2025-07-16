@@ -47,9 +47,11 @@ export default function Produksi() {
     },
   });
 
-  // PRIORITAS AUDIT - FIXED: Auto-kalkulasi rendemen
+  // PRIORITAS AUDIT - FIXED: Auto-kalkulasi rendemen dan estimasi gabah input
   const watchGabahInput = form.watch("jumlahGabahInput");
   const watchBerasOutput = form.watch("jumlahBerasOutput");
+  const watchDedak = form.watch("jumlahDedak");
+  const watchMenir = form.watch("jumlahMenir");
   
   useEffect(() => {
     const gabahInput = parseFloat(watchGabahInput) || 0;
@@ -60,6 +62,23 @@ export default function Produksi() {
       form.setValue("rendemen", rendemen.toFixed(2));
     }
   }, [watchGabahInput, watchBerasOutput, form.setValue]);
+
+  // Auto-estimate gabah input berdasarkan total output (rendemen rata-rata 65%)
+  useEffect(() => {
+    const gabahInput = parseFloat(watchGabahInput) || 0;
+    const berasOutput = parseFloat(watchBerasOutput) || 0;
+    const dedakOutput = parseFloat(watchDedak) || 0;
+    const menirOutput = parseFloat(watchMenir) || 0;
+    
+    // Jika gabah input kosong tapi ada output, estimate gabah input
+    if (gabahInput === 0 && (berasOutput > 0 || dedakOutput > 0 || menirOutput > 0)) {
+      const totalOutput = berasOutput + dedakOutput + menirOutput;
+      const estimatedGabahInput = totalOutput / 0.65; // Asumsi rendemen total 65%
+      
+      // Tampilkan estimasi di placeholder atau helper text
+      form.setValue("jumlahGabahInput", estimatedGabahInput.toFixed(2));
+    }
+  }, [watchBerasOutput, watchDedak, watchMenir, watchGabahInput, form.setValue]);
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -265,8 +284,11 @@ export default function Produksi() {
                           <FormItem>
                             <FormLabel>Jumlah Gabah Input (kg)</FormLabel>
                             <FormControl>
-                              <Input type="number" step="0.01" placeholder="0" {...field} />
+                              <Input type="number" step="0.01" placeholder="0 (otomatis diestimasi)" {...field} />
                             </FormControl>
+                            <p className="text-xs text-gray-500 mt-1">
+                              💡 Kosongkan jika tidak tahu pasti. Sistem akan estimasi berdasarkan output (rendemen ~65%)
+                            </p>
                             <FormMessage />
                           </FormItem>
                         )}
