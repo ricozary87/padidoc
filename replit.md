@@ -228,6 +228,32 @@ The architecture supports a complete rice mill operation with real-time inventor
 
 **Status**: Critical business logic fixes completed. Application now prevents overselling and maintains data integrity. Next priorities are authentication system and performance optimizations.
 
+### Weekly Production Trend Feature Implementation (January 16, 2025)
+
+**Added Weekly Production Trend Dashboard Panel**:
+- **Visual Chart**: Interactive line chart showing 4-week production trends for gabah input and beras output
+- **Summary Statistics**: Total production metrics for beras, gabah, katul, menir with color-coded display
+- **Yield Analysis**: Automatic calculation of average rendemen (yield percentage) across production periods
+- **Navigation Integration**: Direct link to production detail page with hover effects
+- **Empty State Handling**: Graceful display when no production data available with informative messaging
+
+**Technical Implementation**:
+- Added `calculateWeeklyProduction` function to process production data into weekly aggregates
+- Integrated with existing React Query data fetching for real-time updates
+- Used Recharts library for responsive chart visualization with proper formatting
+- Implemented proper field mapping (`jumlahGabahInput`, `jumlahBerasOutput`, etc.)
+
+**Bug Fixes**:
+- **React Import Error Fixed**: Resolved "Can't find variable: React" error in Produksi.tsx by properly importing useEffect
+- **Data Field Mapping**: Corrected field names in weekly trend calculation to match actual database schema
+- **Chart Data Display**: Fixed "Data belum tersedia" issue by using correct production data structure
+
+**UI/UX Improvements**:
+- Replaced static "Jadwal Pengeringan" panel with dynamic "Tren Produksi Mingguan" 
+- Added color-coded trend lines (green for beras, amber for gabah)
+- Implemented responsive tooltip with formatted data display
+- Added proper loading states and error handling for production data
+
 ### "No Values to Update" Error Resolution (January 16, 2025)
 
 **Problem**: Error "No values to update" occurred when updateStok method was called with empty data, causing transaction failures.

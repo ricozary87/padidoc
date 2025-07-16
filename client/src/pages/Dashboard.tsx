@@ -93,8 +93,8 @@ export default function Dashboard() {
         };
       }
       
-      acc[weekKey].totalGabah += parseFloat(item.jumlahGabah || 0);
-      acc[weekKey].totalBeras += parseFloat(item.jumlahBeras || 0);
+      acc[weekKey].totalGabah += parseFloat(item.jumlahGabahInput || 0);
+      acc[weekKey].totalBeras += parseFloat(item.jumlahBerasOutput || 0);
       acc[weekKey].totalKatul += parseFloat(item.jumlahKatul || 0);
       acc[weekKey].totalMenir += parseFloat(item.jumlahMenir || 0);
       acc[weekKey].totalSekam += parseFloat(item.jumlahSekam || 0);

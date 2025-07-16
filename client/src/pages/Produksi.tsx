@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -51,7 +51,7 @@ export default function Produksi() {
   const watchGabahInput = form.watch("jumlahGabahInput");
   const watchBerasOutput = form.watch("jumlahBerasOutput");
   
-  React.useEffect(() => {
+  useEffect(() => {
     const gabahInput = parseFloat(watchGabahInput) || 0;
     const berasOutput = parseFloat(watchBerasOutput) || 0;
     
