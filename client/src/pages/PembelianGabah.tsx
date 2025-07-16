@@ -22,6 +22,7 @@ type FormData = {
   supplierId: string;
   tanggal: string;
   jenisGabah: string;
+  jenisBarang: string; // UPDATE INI UNTUK MULTI PRODUK
   jumlah: string;
   hargaPerKg: string;
   totalHarga: string;
@@ -58,6 +59,7 @@ export default function PembelianGabah() {
       supplierId: "",
       tanggal: new Date().toISOString().split('T')[0],
       jenisGabah: "",
+      jenisBarang: "gabah", // UPDATE INI UNTUK MULTI PRODUK
       jumlah: "",
       hargaPerKg: "",
       totalHarga: "",
@@ -140,6 +142,7 @@ export default function PembelianGabah() {
       supplierId: parseInt(data.supplierId),
       tanggal: new Date(data.tanggal),
       jenisGabah: data.jenisGabah,
+      jenisBarang: data.jenisBarang, // UPDATE INI UNTUK MULTI PRODUK
       jumlah: data.jumlah,
       hargaPerKg: data.hargaPerKg,
       totalHarga: data.totalHarga,
@@ -162,6 +165,7 @@ export default function PembelianGabah() {
       supplierId: item.supplierId?.toString() || "",
       tanggal: new Date(item.tanggal).toISOString().split('T')[0],
       jenisGabah: item.jenisGabah,
+      jenisBarang: item.jenisBarang || "gabah", // UPDATE INI UNTUK MULTI PRODUK
       jumlah: item.jumlah,
       hargaPerKg: item.hargaPerKg,
       totalHarga: item.totalHarga,
@@ -279,7 +283,7 @@ export default function PembelianGabah() {
                         name="jenisGabah"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Jenis Gabah</FormLabel>
+                            <FormLabel>Jenis/Nama Item</FormLabel>
                             <FormControl>
                               <Input placeholder="Contoh: Gabah Kering" {...field} />
                             </FormControl>
@@ -289,10 +293,49 @@ export default function PembelianGabah() {
                       />
                       <FormField
                         control={form.control}
+                        name="jenisBarang"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Jenis Barang</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Pilih jenis barang" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="gabah">Gabah</SelectItem>
+                                <SelectItem value="beras">Beras</SelectItem>
+                                <SelectItem value="katul">Katul</SelectItem>
+                                <SelectItem value="menir">Menir</SelectItem>
+                                <SelectItem value="sekam">Sekam</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
                         name="jumlah"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Jumlah (kg)</FormLabel>
+                            <FormControl>
+                              <Input type="number" placeholder="0" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="hargaPerKg"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Harga per Kg</FormLabel>
                             <FormControl>
                               <Input type="number" placeholder="0" {...field} />
                             </FormControl>
@@ -430,7 +473,8 @@ export default function PembelianGabah() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Tanggal</TableHead>
-                    <TableHead>Jenis Gabah</TableHead>
+                    <TableHead>Jenis Barang</TableHead>
+                    <TableHead>Nama/Detail</TableHead>
                     <TableHead>Jumlah</TableHead>
                     <TableHead>Harga/Kg</TableHead>
                     <TableHead>Total Harga</TableHead>
@@ -441,16 +485,21 @@ export default function PembelianGabah() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center">Loading...</TableCell>
+                      <TableCell colSpan={8} className="text-center">Loading...</TableCell>
                     </TableRow>
                   ) : filteredPembelian?.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center">Belum ada data pembelian</TableCell>
+                      <TableCell colSpan={8} className="text-center">Belum ada data pembelian</TableCell>
                     </TableRow>
                   ) : (
                     filteredPembelian?.map((item: any) => (
                       <TableRow key={item.id}>
                         <TableCell>{formatDate(item.tanggal)}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">
+                            {item.jenisBarang || 'gabah'}
+                          </Badge>
+                        </TableCell>
                         <TableCell>{item.jenisGabah}</TableCell>
                         <TableCell>{item.jumlah} kg</TableCell>
                         <TableCell>{formatCurrency(item.hargaPerKg)}</TableCell>

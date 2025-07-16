@@ -36,7 +36,10 @@ export const pembelian = pgTable("pembelian", {
   id: serial("id").primaryKey(),
   supplierId: integer("supplier_id").references(() => suppliers.id),
   tanggal: timestamp("tanggal").notNull(),
-  jenisGabah: text("jenis_gabah").notNull(),
+  jenisGabah: text("jenis_gabah").notNull(), // Kept for backward compatibility
+  // UPDATE INI UNTUK MULTI PRODUK - Tambah field jenisBarang & asalBarang
+  jenisBarang: text("jenis_barang").notNull().default("gabah"), // gabah, beras, katul, menir, dll
+  asalBarang: text("asal_barang").default("pembelian"), // pembelian, produksi
   jumlah: decimal("jumlah", { precision: 10, scale: 2 }).notNull(),
   hargaPerKg: decimal("harga_per_kg", { precision: 10, scale: 2 }).notNull(),
   totalHarga: decimal("total_harga", { precision: 12, scale: 2 }).notNull(),
@@ -68,10 +71,16 @@ export const produksi = pgTable("produksi", {
   pengeringanId: integer("pengeringan_id").references(() => pengeringan.id),
   tanggal: timestamp("tanggal").notNull(),
   jenisBerasProduced: text("jenis_beras_produced").notNull(),
+  // UPDATE INI UNTUK MULTI PRODUK - Tambah field untuk fleksibilitas sumber bahan
+  sumberBahan: text("sumber_bahan").default("pengeringan"), // pengeringan, pembelian_langsung
+  pembelianId: integer("pembelian_id").references(() => pembelian.id), // Untuk produksi langsung dari pembelian
   jumlahGabahInput: decimal("jumlah_gabah_input", { precision: 10, scale: 2 }),
   jumlahBerasOutput: decimal("jumlah_beras_output", { precision: 10, scale: 2 }),
   jumlahDedak: decimal("jumlah_dedak", { precision: 10, scale: 2 }),
   jumlahMenir: decimal("jumlah_menir", { precision: 10, scale: 2 }),
+  // UPDATE INI UNTUK MULTI PRODUK - Tambah field untuk hasil produksi lainnya
+  jumlahKatul: decimal("jumlah_katul", { precision: 10, scale: 2 }),
+  jumlahSekam: decimal("jumlah_sekam", { precision: 10, scale: 2 }),
   rendemen: decimal("rendemen", { precision: 5, scale: 2 }),
   status: text("status").default("completed"),
   catatan: text("catatan"),
@@ -83,7 +92,10 @@ export const penjualan = pgTable("penjualan", {
   id: serial("id").primaryKey(),
   customerId: integer("customer_id").references(() => customers.id),
   tanggal: timestamp("tanggal").notNull(),
-  jenisBeras: text("jenis_beras").notNull(),
+  jenisBeras: text("jenis_beras").notNull(), // Kept for backward compatibility
+  // UPDATE INI UNTUK MULTI PRODUK - Tambah field jenisBarang & asalBarang
+  jenisBarang: text("jenis_barang").notNull().default("beras"), // beras, katul, menir, gabah, dll
+  asalBarang: text("asal_barang").default("produksi"), // produksi, pembelian_langsung
   jumlah: decimal("jumlah", { precision: 10, scale: 2 }).notNull(),
   hargaPerKg: decimal("harga_per_kg", { precision: 10, scale: 2 }).notNull(),
   totalHarga: decimal("total_harga", { precision: 12, scale: 2 }).notNull(),
@@ -144,6 +156,8 @@ export const pembelianRelations = relations(pembelian, ({ one, many }) => ({
     references: [suppliers.id],
   }),
   pengeringan: many(pengeringan),
+  // UPDATE INI UNTUK MULTI PRODUK - Relasi untuk produksi langsung dari pembelian
+  produksi: many(produksi),
 }));
 
 export const pengeringanRelations = relations(pengeringan, ({ one, many }) => ({
@@ -158,6 +172,11 @@ export const produksiRelations = relations(produksi, ({ one }) => ({
   pengeringan: one(pengeringan, {
     fields: [produksi.pengeringanId],
     references: [pengeringan.id],
+  }),
+  // UPDATE INI UNTUK MULTI PRODUK - Relasi untuk produksi langsung dari pembelian
+  pembelian: one(pembelian, {
+    fields: [produksi.pembelianId],
+    references: [pembelian.id],
   }),
 }));
 

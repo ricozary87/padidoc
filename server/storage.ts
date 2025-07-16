@@ -340,6 +340,10 @@ export class DatabaseStorage implements IStorage {
     todayProduction: number;
     todaySales: number;
     stockRice: number;
+    stockGabah?: number; // UPDATE INI UNTUK MULTI PRODUK
+    stockKatul?: number; // UPDATE INI UNTUK MULTI PRODUK
+    stockMenir?: number; // UPDATE INI UNTUK MULTI PRODUK
+    stockSekam?: number; // UPDATE INI UNTUK MULTI PRODUK
     recentTransactions: any[];
   }> {
     const today = new Date();
@@ -371,6 +375,27 @@ export class DatabaseStorage implements IStorage {
       .from(stok)
       .where(eq(stok.jenisItem, 'beras'));
 
+    // UPDATE INI UNTUK MULTI PRODUK - Stock untuk jenis barang lainnya
+    const gabahStock = await db
+      .select({ total: sql<number>`sum(${stok.jumlah})` })
+      .from(stok)
+      .where(eq(stok.jenisItem, 'gabah'));
+
+    const katulStock = await db
+      .select({ total: sql<number>`sum(${stok.jumlah})` })
+      .from(stok)
+      .where(eq(stok.jenisItem, 'katul'));
+
+    const menirStock = await db
+      .select({ total: sql<number>`sum(${stok.jumlah})` })
+      .from(stok)
+      .where(eq(stok.jenisItem, 'menir'));
+
+    const sekamStock = await db
+      .select({ total: sql<number>`sum(${stok.jumlah})` })
+      .from(stok)
+      .where(eq(stok.jenisItem, 'sekam'));
+
     // Recent transactions
     const recentTransactions = await db
       .select({
@@ -390,6 +415,10 @@ export class DatabaseStorage implements IStorage {
       todayProduction: todayProduction[0]?.total || 0,
       todaySales: todaySales[0]?.total || 0,
       stockRice: riceStock[0]?.total || 0,
+      stockGabah: gabahStock[0]?.total || 0, // UPDATE INI UNTUK MULTI PRODUK
+      stockKatul: katulStock[0]?.total || 0, // UPDATE INI UNTUK MULTI PRODUK
+      stockMenir: menirStock[0]?.total || 0, // UPDATE INI UNTUK MULTI PRODUK
+      stockSekam: sekamStock[0]?.total || 0, // UPDATE INI UNTUK MULTI PRODUK
       recentTransactions,
     };
   }

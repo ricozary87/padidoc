@@ -138,6 +138,34 @@ export default function Dashboard() {
             />
           </div>
 
+          {/* UPDATE INI UNTUK MULTI PRODUK - Stock untuk jenis barang lainnya */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <MetricsCard
+              title="Stok Gabah"
+              value={`${formatNumber(metrics?.stockGabah || 0)} kg`}
+              icon={<Package className="h-5 w-5 text-orange-600" />}
+              iconBgColor="bg-orange-100"
+            />
+            <MetricsCard
+              title="Stok Katul"
+              value={`${formatNumber(metrics?.stockKatul || 0)} kg`}
+              icon={<Package className="h-5 w-5 text-amber-600" />}
+              iconBgColor="bg-amber-100"
+            />
+            <MetricsCard
+              title="Stok Menir"
+              value={`${formatNumber(metrics?.stockMenir || 0)} kg`}
+              icon={<Package className="h-5 w-5 text-indigo-600" />}
+              iconBgColor="bg-indigo-100"
+            />
+            <MetricsCard
+              title="Stok Sekam"
+              value={`${formatNumber(metrics?.stockSekam || 0)} kg`}
+              icon={<Package className="h-5 w-5 text-gray-600" />}
+              iconBgColor="bg-gray-100"
+            />
+          </div>
+
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="shadow-sm border border-gray-200">

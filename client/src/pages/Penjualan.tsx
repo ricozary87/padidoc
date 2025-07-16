@@ -37,6 +37,7 @@ export default function Penjualan() {
       customerId: "",
       tanggal: new Date().toISOString().split('T')[0],
       jenisBeras: "",
+      jenisBarang: "beras", // UPDATE INI UNTUK MULTI PRODUK
       jumlah: "",
       hargaPerKg: "",
       totalHarga: "",
@@ -117,6 +118,7 @@ export default function Penjualan() {
       customerId: parseInt(data.customerId),
       tanggal: new Date(data.tanggal),
       jenisBeras: data.jenisBeras,
+      jenisBarang: data.jenisBarang, // UPDATE INI UNTUK MULTI PRODUK
       jumlah: data.jumlah,
       hargaPerKg: data.hargaPerKg,
       totalHarga: data.totalHarga,
@@ -137,6 +139,7 @@ export default function Penjualan() {
       customerId: item.customerId?.toString() || "",
       tanggal: new Date(item.tanggal).toISOString().split('T')[0],
       jenisBeras: item.jenisBeras,
+      jenisBarang: item.jenisBarang || "beras", // UPDATE INI UNTUK MULTI PRODUK
       jumlah: item.jumlah,
       hargaPerKg: item.hargaPerKg,
       totalHarga: item.totalHarga,
@@ -249,28 +252,45 @@ export default function Penjualan() {
                         )}
                       />
                     </div>
-                    <FormField
-                      control={form.control}
-                      name="jenisBeras"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Jenis Beras</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="jenisBarang"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Jenis Barang</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Pilih jenis barang" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="beras">Beras</SelectItem>
+                                <SelectItem value="gabah">Gabah</SelectItem>
+                                <SelectItem value="katul">Katul</SelectItem>
+                                <SelectItem value="menir">Menir</SelectItem>
+                                <SelectItem value="sekam">Sekam</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="jenisBeras"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nama/Detail Item</FormLabel>
                             <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Pilih jenis beras" />
-                              </SelectTrigger>
+                              <Input placeholder="Contoh: Beras Premium" {...field} />
                             </FormControl>
-                            <SelectContent>
-                              <SelectItem value="Beras Premium">Beras Premium</SelectItem>
-                              <SelectItem value="Beras Medium">Beras Medium</SelectItem>
-                              <SelectItem value="Beras Pecah">Beras Pecah</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                     <div className="grid grid-cols-3 gap-4">
                       <FormField
                         control={form.control}
@@ -385,7 +405,8 @@ export default function Penjualan() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Tanggal</TableHead>
-                    <TableHead>Jenis Beras</TableHead>
+                    <TableHead>Jenis Barang</TableHead>
+                    <TableHead>Nama/Detail</TableHead>
                     <TableHead>Jumlah</TableHead>
                     <TableHead>Harga/Kg</TableHead>
                     <TableHead>Total Harga</TableHead>
@@ -396,16 +417,21 @@ export default function Penjualan() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center">Loading...</TableCell>
+                      <TableCell colSpan={8} className="text-center">Loading...</TableCell>
                     </TableRow>
                   ) : filteredPenjualan?.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center">Belum ada data penjualan</TableCell>
+                      <TableCell colSpan={8} className="text-center">Belum ada data penjualan</TableCell>
                     </TableRow>
                   ) : (
                     filteredPenjualan?.map((item: any) => (
                       <TableRow key={item.id}>
                         <TableCell>{formatDate(item.tanggal)}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">
+                            {item.jenisBarang || 'beras'}
+                          </Badge>
+                        </TableCell>
                         <TableCell>{item.jenisBeras}</TableCell>
                         <TableCell>{item.jumlah} kg</TableCell>
                         <TableCell>{formatCurrency(item.hargaPerKg)}</TableCell>
