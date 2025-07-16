@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Bell, ShoppingCart, Settings, DollarSign, Package, BarChart3, Calculator, Plus, CheckCircle, XCircle, Scale, TrendingUp, TrendingDown, Wallet, ExternalLink } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import MetricsCard from "@/components/MetricsCard";
@@ -17,6 +18,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { calculateWeeklyCashFlow, generateDailyCashFlowData, formatCurrency, formatNumber } from "@/lib/cashFlowCalculator";
 
 export default function Dashboard() {
+  const [, setLocation] = useLocation();
+  
   const { data: metrics, isLoading } = useQuery({
     queryKey: ["/api/dashboard/metrics"],
   });
@@ -213,6 +216,7 @@ export default function Dashboard() {
                 isPositive: true,
                 label: "dari kemarin"
               }}
+              onClick={() => setLocation("/pembelian-gabah")}
             />
             <MetricsCard
               title="Produksi Hari Ini"
@@ -226,6 +230,7 @@ export default function Dashboard() {
                 isPositive: true,
                 label: "dari kemarin"
               }}
+              onClick={() => setLocation("/produksi")}
             />
             <MetricsCard
               title="Penjualan Hari Ini"
@@ -239,6 +244,7 @@ export default function Dashboard() {
                 isPositive: false,
                 label: "dari kemarin"
               }}
+              onClick={() => setLocation("/penjualan")}
             />
             <MetricsCard
               title="Stok Beras"
@@ -252,6 +258,7 @@ export default function Dashboard() {
                 isPositive: true,
                 label: "Status:"
               }}
+              onClick={() => setLocation("/stok")}
             />
           </div>
 
@@ -264,6 +271,7 @@ export default function Dashboard() {
               iconBgColor="bg-orange-100"
               colorBg="bg-orange-100"
               colorText="text-orange-800"
+              onClick={() => setLocation("/stok")}
             />
             <MetricsCard
               title="Stok Katul"
@@ -272,6 +280,7 @@ export default function Dashboard() {
               iconBgColor="bg-yellow-200"
               colorBg="bg-yellow-200"
               colorText="text-yellow-900"
+              onClick={() => setLocation("/stok")}
             />
             <MetricsCard
               title="Stok Menir"
@@ -280,6 +289,7 @@ export default function Dashboard() {
               iconBgColor="bg-red-100"
               colorBg="bg-red-100"
               colorText="text-red-800"
+              onClick={() => setLocation("/stok")}
             />
             <MetricsCard
               title="Stok Sekam"
@@ -288,6 +298,7 @@ export default function Dashboard() {
               iconBgColor="bg-gray-100"
               colorBg="bg-gray-100"
               colorText="text-gray-700"
+              onClick={() => setLocation("/stok")}
             />
           </div>
 

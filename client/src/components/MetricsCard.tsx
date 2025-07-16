@@ -13,6 +13,7 @@ interface MetricsCardProps {
   iconBgColor?: string;
   colorBg?: string;
   colorText?: string;
+  onClick?: () => void;
 }
 
 export default function MetricsCard({ 
@@ -22,10 +23,14 @@ export default function MetricsCard({
   trend, 
   iconBgColor = "bg-blue-100",
   colorBg = "bg-blue-100",
-  colorText = "text-blue-800"
+  colorText = "text-blue-800",
+  onClick
 }: MetricsCardProps) {
   return (
-    <Card className={`shadow-md hover:shadow-lg hover:scale-105 transition duration-200 ease-in-out rounded-lg p-4 ${colorBg} ${colorText}`}>
+    <Card 
+      className={`shadow-md hover:shadow-lg hover:scale-105 transition duration-200 ease-in-out rounded-lg p-4 ${colorBg} ${colorText} ${onClick ? 'cursor-pointer hover:opacity-90' : ''}`}
+      onClick={onClick}
+    >
       <CardContent className="p-2">
         <div className="flex items-center justify-between">
           <div>
