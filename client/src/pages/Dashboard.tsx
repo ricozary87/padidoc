@@ -350,11 +350,10 @@ export default function Dashboard() {
                   <Dialog open={isSimulationOpen} onOpenChange={setIsSimulationOpen}>
                     <DialogTrigger asChild>
                       <Button 
-                        variant="outline" 
-                        className="w-full flex items-center justify-center space-x-2 hover:bg-green-50 hover:border-green-500 transition-colors"
+                        className="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700 py-3 px-4 text-base font-semibold transition-colors shadow-md hover:shadow-lg"
                         onClick={() => resetSimulation()}
                       >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-5 w-5" />
                         <span>Simulasi Rendemen</span>
                       </Button>
                     </DialogTrigger>
