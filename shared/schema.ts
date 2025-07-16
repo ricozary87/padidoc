@@ -216,16 +216,113 @@ export const logStokRelations = relations(logStok, ({ one }) => ({
   }),
 }));
 
-// Insert schemas
+// PRIORITAS AUDIT - FIXED: Insert schemas dengan validasi yang lebih ketat
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertSupplierSchema = createInsertSchema(suppliers).omit({ id: true, createdAt: true });
 export const insertCustomerSchema = createInsertSchema(customers).omit({ id: true, createdAt: true });
-export const insertPembelianSchema = createInsertSchema(pembelian).omit({ id: true, createdAt: true });
-export const insertPengeringanSchema = createInsertSchema(pengeringan).omit({ id: true, createdAt: true });
-export const insertProduksiSchema = createInsertSchema(produksi).omit({ id: true, createdAt: true });
-export const insertPenjualanSchema = createInsertSchema(penjualan).omit({ id: true, createdAt: true });
-export const insertPengeluaranSchema = createInsertSchema(pengeluaran).omit({ id: true, createdAt: true });
-export const insertStokSchema = createInsertSchema(stok).omit({ id: true, updatedAt: true });
+
+export const insertPembelianSchema = createInsertSchema(pembelian).omit({ id: true, createdAt: true }).extend({
+  jumlah: z.string().refine(val => parseFloat(val) > 0, {
+    message: "Jumlah harus lebih dari 0"
+  }),
+  hargaPerKg: z.string().refine(val => parseFloat(val) > 0, {
+    message: "Harga per kg harus lebih dari 0"
+  }),
+  totalHarga: z.string().refine(val => parseFloat(val) > 0, {
+    message: "Total harga harus lebih dari 0"
+  }),
+  kadarAir: z.string().optional().refine(val => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 100), {
+    message: "Kadar air harus antara 0-100%"
+  }),
+  tanggal: z.date().refine(date => date <= new Date(), {
+    message: "Tanggal tidak boleh di masa depan"
+  })
+});
+
+export const insertPengeringanSchema = createInsertSchema(pengeringan).omit({ id: true, createdAt: true }).extend({
+  tanggalMulai: z.date().refine(date => date <= new Date(), {
+    message: "Tanggal mulai tidak boleh di masa depan"
+  }),
+  tanggalSelesai: z.date().optional().refine(date => !date || date >= new Date(), {
+    message: "Tanggal selesai tidak boleh di masa lalu"
+  }),
+  kadarAirAwal: z.string().optional().refine(val => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 100), {
+    message: "Kadar air awal harus antara 0-100%"
+  }),
+  kadarAirAkhir: z.string().optional().refine(val => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 100), {
+    message: "Kadar air akhir harus antara 0-100%"
+  }),
+  jumlahAwal: z.string().optional().refine(val => !val || parseFloat(val) > 0, {
+    message: "Jumlah awal harus lebih dari 0"
+  }),
+  jumlahAkhir: z.string().optional().refine(val => !val || parseFloat(val) > 0, {
+    message: "Jumlah akhir harus lebih dari 0"
+  })
+});
+
+export const insertProduksiSchema = createInsertSchema(produksi).omit({ id: true, createdAt: true }).extend({
+  jumlahGabahInput: z.string().optional().refine(val => !val || parseFloat(val) > 0, {
+    message: "Jumlah gabah input harus lebih dari 0"
+  }),
+  jumlahBerasOutput: z.string().optional().refine(val => !val || parseFloat(val) > 0, {
+    message: "Jumlah beras output harus lebih dari 0"
+  }),
+  jumlahDedak: z.string().optional().refine(val => !val || parseFloat(val) >= 0, {
+    message: "Jumlah dedak tidak boleh negatif"
+  }),
+  jumlahMenir: z.string().optional().refine(val => !val || parseFloat(val) >= 0, {
+    message: "Jumlah menir tidak boleh negatif"
+  }),
+  jumlahKatul: z.string().optional().refine(val => !val || parseFloat(val) >= 0, {
+    message: "Jumlah katul tidak boleh negatif"
+  }),
+  jumlahSekam: z.string().optional().refine(val => !val || parseFloat(val) >= 0, {
+    message: "Jumlah sekam tidak boleh negatif"
+  }),
+  rendemen: z.string().optional().refine(val => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 100), {
+    message: "Rendemen harus antara 0-100%"
+  }),
+  tanggal: z.date().refine(date => date <= new Date(), {
+    message: "Tanggal tidak boleh di masa depan"
+  })
+});
+
+export const insertPenjualanSchema = createInsertSchema(penjualan).omit({ id: true, createdAt: true }).extend({
+  jumlah: z.string().refine(val => parseFloat(val) > 0, {
+    message: "Jumlah harus lebih dari 0"
+  }),
+  hargaPerKg: z.string().refine(val => parseFloat(val) > 0, {
+    message: "Harga per kg harus lebih dari 0"
+  }),
+  totalHarga: z.string().refine(val => parseFloat(val) > 0, {
+    message: "Total harga harus lebih dari 0"
+  }),
+  tanggal: z.date().refine(date => date <= new Date(), {
+    message: "Tanggal tidak boleh di masa depan"
+  })
+});
+
+export const insertPengeluaranSchema = createInsertSchema(pengeluaran).omit({ id: true, createdAt: true }).extend({
+  jumlah: z.string().refine(val => parseFloat(val) > 0, {
+    message: "Jumlah pengeluaran harus lebih dari 0"
+  }),
+  tanggal: z.date().refine(date => date <= new Date(), {
+    message: "Tanggal tidak boleh di masa depan"
+  })
+});
+
+export const insertStokSchema = createInsertSchema(stok).omit({ id: true, updatedAt: true }).extend({
+  jumlah: z.string().refine(val => parseFloat(val) >= 0, {
+    message: "Jumlah stok tidak boleh negatif"
+  }),
+  hargaRataRata: z.string().optional().refine(val => !val || parseFloat(val) >= 0, {
+    message: "Harga rata-rata tidak boleh negatif"
+  }),
+  batasMinimum: z.string().optional().refine(val => !val || parseFloat(val) >= 0, {
+    message: "Batas minimum tidak boleh negatif"
+  })
+});
+
 export const insertLogStokSchema = createInsertSchema(logStok).omit({ id: true, createdAt: true });
 export const insertSettingsSchema = createInsertSchema(settings).omit({ id: true, updatedAt: true });
 

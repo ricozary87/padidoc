@@ -261,12 +261,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pembelian", async (req, res) => {
     try {
+      // PRIORITAS AUDIT - FIXED: Validasi dengan schema yang ketat
       const validatedData = insertPembelianSchema.parse(req.body);
       const pembelian = await storage.createPembelian(validatedData);
       res.status(201).json(pembelian);
     } catch (error) {
       console.error("Error creating pembelian:", error);
-      res.status(400).json({ message: "Invalid pembelian data" });
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(400).json({ message: "Invalid pembelian data" });
+      }
     }
   });
 
@@ -328,12 +333,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/produksi", async (req, res) => {
     try {
+      // PRIORITAS AUDIT - FIXED: Validasi dengan schema yang ketat + validasi stok
       const validatedData = insertProduksiSchema.parse(req.body);
       const produksi = await storage.createProduksi(validatedData);
       res.status(201).json(produksi);
     } catch (error) {
       console.error("Error creating produksi:", error);
-      res.status(400).json({ message: "Invalid produksi data" });
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(400).json({ message: "Invalid produksi data" });
+      }
     }
   });
 
@@ -391,12 +401,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/penjualan", async (req, res) => {
     try {
+      // PRIORITAS AUDIT - FIXED: Validasi dengan schema yang ketat + validasi stok
       const validatedData = insertPenjualanSchema.parse(req.body);
       const penjualan = await storage.createPenjualan(validatedData);
       res.status(201).json(penjualan);
     } catch (error) {
       console.error("Error creating penjualan:", error);
-      res.status(400).json({ message: "Invalid penjualan data" });
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(400).json({ message: "Invalid penjualan data" });
+      }
     }
   });
 

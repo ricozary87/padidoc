@@ -187,3 +187,43 @@ The architecture supports a complete rice mill operation with real-time inventor
 **Performance Issues**: No pagination, excessive auto-refresh (30s intervals), missing search debouncing, multiple separate queries in dashboard
 
 **Status**: Application has solid UI/UX foundation but requires critical business logic fixes before production deployment. Next session will focus on implementing priority fixes.
+
+### Critical Business Logic Fixes Implementation (January 16, 2025)
+
+**Implemented High Priority Fixes**:
+1. **Auto-update Stock System**: Created helper functions `updateStok()` and `logStokPerubahan()` for automatic stock management
+   - Prevents negative stock with validation before transactions
+   - Logs all stock changes with transaction references
+   - Handles pembelian (stock increase), penjualan (stock decrease), and produksi (input decrease, output increase)
+   - Validates stock availability before processing transactions
+
+2. **Enhanced Form Validation**: Strengthened schema validation with strict business rules
+   - Added negative value validation for prices, quantities, and percentages
+   - Prevents future dates in transaction forms
+   - Validates kadar air (0-100%), rendemen (0-100%), and other range constraints
+   - Improved error messages with descriptive validation feedback
+
+3. **Auto-calculation Features**: Implemented real-time calculations in forms
+   - **Pembelian**: Auto-calculates total harga from jumlah × harga per kg
+   - **Penjualan**: Auto-calculates total harga from jumlah × harga per kg
+   - **Produksi**: Auto-calculates rendemen from (beras output / gabah input) × 100%
+   - All calculations update in real-time using React form watch
+
+4. **Error Handling Improvements**: Better error propagation and user feedback
+   - Specific error messages for stock validation failures
+   - Clear feedback when stock is insufficient for transactions
+   - Enhanced backend error handling with proper HTTP status codes
+
+**Code Quality Improvements**:
+- Added "PRIORITAS AUDIT - FIXED" comments to all modified sections
+- Used React.useEffect with form.watch for efficient auto-calculations
+- Implemented readonly fields for auto-calculated values
+- Enhanced user experience with immediate feedback
+
+**Stock Management Logic**:
+- Pembelian: Adds stock to inventory automatically
+- Penjualan: Validates sufficient stock before allowing transaction
+- Produksi: Validates gabah input stock and adds output products to inventory
+- All transactions create audit logs for stock changes
+
+**Status**: Critical business logic fixes completed. Application now prevents overselling and maintains data integrity. Next priorities are authentication system and performance optimizations.

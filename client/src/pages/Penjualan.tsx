@@ -52,6 +52,20 @@ export default function Penjualan() {
     },
   });
 
+  // PRIORITAS AUDIT - FIXED: Auto-kalkulasi total harga
+  const watchJumlah = form.watch("jumlah");
+  const watchHargaPerKg = form.watch("hargaPerKg");
+  
+  React.useEffect(() => {
+    const jumlah = parseFloat(watchJumlah) || 0;
+    const hargaPerKg = parseFloat(watchHargaPerKg) || 0;
+    const totalHarga = jumlah * hargaPerKg;
+    
+    if (jumlah > 0 && hargaPerKg > 0) {
+      form.setValue("totalHarga", totalHarga.toString());
+    }
+  }, [watchJumlah, watchHargaPerKg, form.setValue]);
+
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest("POST", "/api/penjualan", data);

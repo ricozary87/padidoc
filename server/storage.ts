@@ -36,6 +36,22 @@ import {
 import { db } from "./db";
 import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
 
+// PRIORITAS AUDIT - FIXED: Helper types untuk auto-update stok dan log perubahan
+interface StockUpdateResult {
+  success: boolean;
+  message?: string;
+  previousStock?: number;
+  newStock?: number;
+}
+
+interface StockLogData {
+  jenisTransaksi: 'masuk' | 'keluar' | 'adjustment';
+  jumlah: number;
+  referensiId?: number;
+  referensiTabel?: string;
+  keterangan?: string;
+}
+
 export interface IStorage {
   // User operations
   getUser(id: number): Promise<User | undefined>;
@@ -123,6 +139,71 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // PRIORITAS AUDIT - FIXED: Helper function untuk auto-update stok dan log perubahan
+  private async updateStok(jenisItem: string, jumlahPerubahan: number, logData: StockLogData): Promise<StockUpdateResult> {
+    try {
+      // Cari atau buat record stok
+      let [existingStock] = await db.select().from(stok).where(eq(stok.jenisItem, jenisItem));
+      
+      if (!existingStock) {
+        // Jika stok belum ada, buat record baru
+        [existingStock] = await db.insert(stok).values({
+          jenisItem,
+          jumlah: '0',
+          satuan: 'kg',
+          hargaRataRata: '0',
+          batasMinimum: '0',
+          lokasi: 'Gudang Utama'
+        }).returning();
+      }
+
+      const previousStock = parseFloat(existingStock.jumlah.toString());
+      const newStock = previousStock + jumlahPerubahan;
+
+      // Validasi stok tidak boleh negatif
+      if (newStock < 0) {
+        return {
+          success: false,
+          message: `Stok ${jenisItem} tidak mencukupi. Stok saat ini: ${previousStock} kg, dibutuhkan: ${Math.abs(jumlahPerubahan)} kg`,
+          previousStock,
+          newStock: previousStock
+        };
+      }
+
+      // Update stok
+      await db.update(stok)
+        .set({ 
+          jumlah: newStock.toString(),
+          updatedAt: new Date()
+        })
+        .where(eq(stok.id, existingStock.id));
+
+      // Log perubahan stok
+      await db.insert(logStok).values({
+        stokId: existingStock.id,
+        jenisTransaksi: logData.jenisTransaksi,
+        jumlah: jumlahPerubahan.toString(),
+        jumlahSebelum: previousStock.toString(),
+        jumlahSesudah: newStock.toString(),
+        referensiId: logData.referensiId,
+        referensiTabel: logData.referensiTabel,
+        keterangan: logData.keterangan
+      });
+
+      return {
+        success: true,
+        previousStock,
+        newStock
+      };
+    } catch (error) {
+      console.error('Error updating stock:', error);
+      return {
+        success: false,
+        message: 'Gagal memperbarui stok'
+      };
+    }
+  }
+
   // User operations
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -198,7 +279,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPembelian(insertPembelian: InsertPembelian): Promise<Pembelian> {
+    // PRIORITAS AUDIT - FIXED: Auto-update stok saat pembelian
     const [item] = await db.insert(pembelian).values(insertPembelian).returning();
+    
+    // Update stok setelah pembelian berhasil
+    const jenisBarang = insertPembelian.jenisBarang || 'gabah';
+    const jumlah = parseFloat(insertPembelian.jumlah.toString());
+    
+    const stockResult = await this.updateStok(jenisBarang, jumlah, {
+      jenisTransaksi: 'masuk',
+      referensiId: item.id,
+      referensiTabel: 'pembelian',
+      keterangan: `Pembelian ${jenisBarang} sebanyak ${jumlah} kg`
+    });
+
+    if (!stockResult.success) {
+      console.error('Stock update failed:', stockResult.message);
+      // Note: Tidak menghentikan proses karena ini adalah pembelian (masuk)
+    }
+
     return item;
   }
 
@@ -246,7 +345,80 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProduksi(insertProduksi: InsertProduksi): Promise<Produksi> {
+    // PRIORITAS AUDIT - FIXED: Auto-update stok saat produksi (kurangi input, tambah output)
+    const gabahInput = parseFloat(insertProduksi.jumlahGabahInput?.toString() || '0');
+    const berasOutput = parseFloat(insertProduksi.jumlahBerasOutput?.toString() || '0');
+    const katulOutput = parseFloat(insertProduksi.jumlahKatul?.toString() || '0');
+    const menirOutput = parseFloat(insertProduksi.jumlahMenir?.toString() || '0');
+    const sekamOutput = parseFloat(insertProduksi.jumlahSekam?.toString() || '0');
+    
+    // Validasi stok gabah input
+    if (gabahInput > 0) {
+      const stockResult = await this.updateStok('gabah', -gabahInput, {
+        jenisTransaksi: 'keluar',
+        referensiId: 0, // Temporary
+        referensiTabel: 'produksi',
+        keterangan: `Produksi menggunakan gabah sebanyak ${gabahInput} kg`
+      });
+
+      if (!stockResult.success) {
+        throw new Error(stockResult.message || 'Stok gabah tidak mencukupi untuk produksi');
+      }
+    }
+
+    // Jika validasi berhasil, lanjutkan dengan produksi
     const [item] = await db.insert(produksi).values(insertProduksi).returning();
+    
+    // Update referensi ID di log stok gabah
+    await db.update(logStok)
+      .set({ referensiId: item.id })
+      .where(and(
+        eq(logStok.referensiTabel, 'produksi'),
+        eq(logStok.referensiId, 0)
+      ));
+
+    // Tambahkan hasil produksi ke stok
+    const updatePromises = [];
+    
+    if (berasOutput > 0) {
+      updatePromises.push(this.updateStok('beras', berasOutput, {
+        jenisTransaksi: 'masuk',
+        referensiId: item.id,
+        referensiTabel: 'produksi',
+        keterangan: `Produksi menghasilkan beras sebanyak ${berasOutput} kg`
+      }));
+    }
+    
+    if (katulOutput > 0) {
+      updatePromises.push(this.updateStok('katul', katulOutput, {
+        jenisTransaksi: 'masuk',
+        referensiId: item.id,
+        referensiTabel: 'produksi',
+        keterangan: `Produksi menghasilkan katul sebanyak ${katulOutput} kg`
+      }));
+    }
+    
+    if (menirOutput > 0) {
+      updatePromises.push(this.updateStok('menir', menirOutput, {
+        jenisTransaksi: 'masuk',
+        referensiId: item.id,
+        referensiTabel: 'produksi',
+        keterangan: `Produksi menghasilkan menir sebanyak ${menirOutput} kg`
+      }));
+    }
+    
+    if (sekamOutput > 0) {
+      updatePromises.push(this.updateStok('sekam', sekamOutput, {
+        jenisTransaksi: 'masuk',
+        referensiId: item.id,
+        referensiTabel: 'produksi',
+        keterangan: `Produksi menghasilkan sekam sebanyak ${sekamOutput} kg`
+      }));
+    }
+
+    // Tunggu semua update stok selesai
+    await Promise.all(updatePromises);
+
     return item;
   }
 
@@ -270,7 +442,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPenjualan(insertPenjualan: InsertPenjualan): Promise<Penjualan> {
+    // PRIORITAS AUDIT - FIXED: Auto-update stok saat penjualan dengan validasi
+    const jenisBarang = insertPenjualan.jenisBarang || 'beras';
+    const jumlah = parseFloat(insertPenjualan.jumlah.toString());
+    
+    // Validasi stok sebelum penjualan
+    const stockResult = await this.updateStok(jenisBarang, -jumlah, {
+      jenisTransaksi: 'keluar',
+      referensiId: 0, // Temporary, akan diupdate setelah insert
+      referensiTabel: 'penjualan',
+      keterangan: `Penjualan ${jenisBarang} sebanyak ${jumlah} kg`
+    });
+
+    if (!stockResult.success) {
+      throw new Error(stockResult.message || 'Stok tidak mencukupi untuk penjualan');
+    }
+
+    // Jika validasi stok berhasil, lanjutkan dengan penjualan
     const [item] = await db.insert(penjualan).values(insertPenjualan).returning();
+    
+    // Update referensi ID di log stok
+    await db.update(logStok)
+      .set({ referensiId: item.id })
+      .where(and(
+        eq(logStok.referensiTabel, 'penjualan'),
+        eq(logStok.referensiId, 0)
+      ));
+
     return item;
   }
 

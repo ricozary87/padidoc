@@ -47,6 +47,20 @@ export default function Produksi() {
     },
   });
 
+  // PRIORITAS AUDIT - FIXED: Auto-kalkulasi rendemen
+  const watchGabahInput = form.watch("jumlahGabahInput");
+  const watchBerasOutput = form.watch("jumlahBerasOutput");
+  
+  React.useEffect(() => {
+    const gabahInput = parseFloat(watchGabahInput) || 0;
+    const berasOutput = parseFloat(watchBerasOutput) || 0;
+    
+    if (gabahInput > 0 && berasOutput > 0) {
+      const rendemen = (berasOutput / gabahInput) * 100;
+      form.setValue("rendemen", rendemen.toFixed(2));
+    }
+  }, [watchGabahInput, watchBerasOutput, form.setValue]);
+
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest("POST", "/api/produksi", data);

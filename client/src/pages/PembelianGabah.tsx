@@ -77,6 +77,20 @@ export default function PembelianGabah() {
     },
   });
 
+  // PRIORITAS AUDIT - FIXED: Auto-kalkulasi total harga
+  const watchJumlah = form.watch("jumlah");
+  const watchHargaPerKg = form.watch("hargaPerKg");
+  
+  React.useEffect(() => {
+    const jumlah = parseFloat(watchJumlah) || 0;
+    const hargaPerKg = parseFloat(watchHargaPerKg) || 0;
+    const totalHarga = jumlah * hargaPerKg;
+    
+    if (jumlah > 0 && hargaPerKg > 0) {
+      form.setValue("totalHarga", totalHarga.toString());
+    }
+  }, [watchJumlah, watchHargaPerKg, form.setValue]);
+
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest("POST", "/api/pembelian", data);
@@ -360,7 +374,7 @@ export default function PembelianGabah() {
                         )}
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
                       <FormField
                         control={form.control}
                         name="jumlah"
@@ -387,21 +401,6 @@ export default function PembelianGabah() {
                           </FormItem>
                         )}
                       />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                      <FormField
-                        control={form.control}
-                        name="hargaPerKg"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm">Harga per Kg</FormLabel>
-                            <FormControl>
-                              <Input type="number" placeholder="0" {...field} className="text-sm" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
                       <FormField
                         control={form.control}
                         name="totalHarga"
@@ -409,7 +408,7 @@ export default function PembelianGabah() {
                           <FormItem>
                             <FormLabel>Total Harga</FormLabel>
                             <FormControl>
-                              <Input type="number" placeholder="0" {...field} />
+                              <Input type="number" placeholder="0" {...field} readOnly className="bg-gray-50" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
