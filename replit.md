@@ -279,3 +279,38 @@ The architecture supports a complete rice mill operation with real-time inventor
 - ✓ Overselling Protection: Prevents negative stock
 
 **Current Stock Management**: System now maintains accurate inventory across all product types (gabah, beras, katul, menir, sekam) with complete transaction logging.
+
+### Critical React Import Fixes and Cash Flow Improvements (January 16, 2025)
+
+**React Import Error Resolution**:
+- **Fixed PembelianGabah.tsx**: Added proper `useEffect` import, replaced `React.useEffect` with `useEffect`
+- **Fixed Penjualan.tsx**: Added proper `useEffect` import, replaced `React.useEffect` with `useEffect`
+- **Fixed Produksi.tsx**: Previously resolved similar import issue
+- **Result**: Eliminated all "Can't find variable: React" errors across the application
+
+**Cash Flow Data Correction**:
+- **Fixed Field Mapping**: Corrected `harga_total` to `totalHarga` in cash flow calculations
+- **Added Type Conversion**: Implemented `parseFloat()` for proper number conversion
+- **Resolved Display Issues**: Fixed "RpNaN" displaying in cash flow panel
+- **Fixed Chart Data**: Corrected chart data usage from `cashFlow.chartData` to `chartData`
+- **Removed Duplicate Variables**: Eliminated duplicate `cashFlow` variable definitions causing syntax errors
+
+**Auto-Estimate Gabah Input Feature**:
+- **Smart Estimation**: Added automatic gabah input estimation based on total output using 65% rendemen
+- **Enhanced UX**: Added helpful placeholder text and instructions for gabah input field
+- **Flexible Operations**: Supports both manual input and auto-estimation workflows
+- **Real-time Calculation**: Updates gabah input automatically when output values change
+- **Operational Benefit**: Solves real-world problem of uncertain gabah quantities in continuous production
+
+**Production Workflow Improvements**:
+- **Two-Mode Operation**: Manual input for precise tracking, auto-estimate for continuous production
+- **Better User Guidance**: Clear instructions on when to use each mode
+- **Maintained Validation**: Stock validation still applies regardless of input method
+- **Enhanced Logging**: All transactions properly logged with appropriate references
+
+**Current Application State**:
+- ✓ All pages accessible without React errors
+- ✓ Cash flow panel displays accurate financial data
+- ✓ Production form supports flexible gabah input workflows
+- ✓ Auto-refresh and real-time updates working correctly
+- ✓ Complete transaction logging and stock management functional
