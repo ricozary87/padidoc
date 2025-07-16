@@ -234,16 +234,31 @@ export const insertPembelianSchema = createInsertSchema(pembelian).omit({ id: tr
   kadarAir: z.string().optional().refine(val => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 100), {
     message: "Kadar air harus antara 0-100%"
   }),
-  tanggal: z.date().refine(date => date <= new Date(), {
+  tanggal: z.union([z.date(), z.string()]).transform(val => {
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }).refine(date => date <= new Date(), {
     message: "Tanggal tidak boleh di masa depan"
   })
 });
 
 export const insertPengeringanSchema = createInsertSchema(pengeringan).omit({ id: true, createdAt: true }).extend({
-  tanggalMulai: z.date().refine(date => date <= new Date(), {
+  tanggalMulai: z.union([z.date(), z.string()]).transform(val => {
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }).refine(date => date <= new Date(), {
     message: "Tanggal mulai tidak boleh di masa depan"
   }),
-  tanggalSelesai: z.date().optional().refine(date => !date || date >= new Date(), {
+  tanggalSelesai: z.union([z.date(), z.string()]).optional().transform(val => {
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }).refine(date => !date || date >= new Date(), {
     message: "Tanggal selesai tidak boleh di masa lalu"
   }),
   kadarAirAwal: z.string().optional().refine(val => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 100), {
@@ -282,7 +297,12 @@ export const insertProduksiSchema = createInsertSchema(produksi).omit({ id: true
   rendemen: z.string().optional().refine(val => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 100), {
     message: "Rendemen harus antara 0-100%"
   }),
-  tanggal: z.date().refine(date => date <= new Date(), {
+  tanggal: z.union([z.date(), z.string()]).transform(val => {
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }).refine(date => date <= new Date(), {
     message: "Tanggal tidak boleh di masa depan"
   })
 });
@@ -297,7 +317,12 @@ export const insertPenjualanSchema = createInsertSchema(penjualan).omit({ id: tr
   totalHarga: z.string().refine(val => parseFloat(val) > 0, {
     message: "Total harga harus lebih dari 0"
   }),
-  tanggal: z.date().refine(date => date <= new Date(), {
+  tanggal: z.union([z.date(), z.string()]).transform(val => {
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }).refine(date => date <= new Date(), {
     message: "Tanggal tidak boleh di masa depan"
   })
 });
@@ -306,7 +331,12 @@ export const insertPengeluaranSchema = createInsertSchema(pengeluaran).omit({ id
   jumlah: z.string().refine(val => parseFloat(val) > 0, {
     message: "Jumlah pengeluaran harus lebih dari 0"
   }),
-  tanggal: z.date().refine(date => date <= new Date(), {
+  tanggal: z.union([z.date(), z.string()]).transform(val => {
+    if (typeof val === 'string') {
+      return new Date(val);
+    }
+    return val;
+  }).refine(date => date <= new Date(), {
     message: "Tanggal tidak boleh di masa depan"
   })
 });

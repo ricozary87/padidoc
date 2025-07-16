@@ -140,7 +140,7 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   // PRIORITAS AUDIT - FIXED: Helper function untuk auto-update stok dan log perubahan
-  private async updateStok(jenisItem: string, jumlahPerubahan: number, logData: StockLogData): Promise<StockUpdateResult> {
+  private async autoUpdateStok(jenisItem: string, jumlahPerubahan: number, logData: StockLogData): Promise<StockUpdateResult> {
     try {
       // Cari atau buat record stok
       let [existingStock] = await db.select().from(stok).where(eq(stok.jenisItem, jenisItem));
@@ -171,12 +171,16 @@ export class DatabaseStorage implements IStorage {
       }
 
       // Update stok
-      await db.update(stok)
-        .set({ 
-          jumlah: newStock.toString(),
-          updatedAt: new Date()
-        })
-        .where(eq(stok.id, existingStock.id));
+      const updateData = { 
+        jumlah: newStock.toString(),
+        updatedAt: new Date()
+      };
+      
+      if (Object.keys(updateData).length > 0) {
+        await db.update(stok)
+          .set(updateData)
+          .where(eq(stok.id, existingStock.id));
+      }
 
       // Log perubahan stok
       await db.insert(logStok).values({
@@ -286,7 +290,7 @@ export class DatabaseStorage implements IStorage {
     const jenisBarang = insertPembelian.jenisBarang || 'gabah';
     const jumlah = parseFloat(insertPembelian.jumlah.toString());
     
-    const stockResult = await this.updateStok(jenisBarang, jumlah, {
+    const stockResult = await this.autoUpdateStok(jenisBarang, jumlah, {
       jenisTransaksi: 'masuk',
       referensiId: item.id,
       referensiTabel: 'pembelian',
@@ -354,7 +358,7 @@ export class DatabaseStorage implements IStorage {
     
     // Validasi stok gabah input
     if (gabahInput > 0) {
-      const stockResult = await this.updateStok('gabah', -gabahInput, {
+      const stockResult = await this.autoUpdateStok('gabah', -gabahInput, {
         jenisTransaksi: 'keluar',
         referensiId: 0, // Temporary
         referensiTabel: 'produksi',
@@ -381,7 +385,7 @@ export class DatabaseStorage implements IStorage {
     const updatePromises = [];
     
     if (berasOutput > 0) {
-      updatePromises.push(this.updateStok('beras', berasOutput, {
+      updatePromises.push(this.autoUpdateStok('beras', berasOutput, {
         jenisTransaksi: 'masuk',
         referensiId: item.id,
         referensiTabel: 'produksi',
@@ -390,7 +394,7 @@ export class DatabaseStorage implements IStorage {
     }
     
     if (katulOutput > 0) {
-      updatePromises.push(this.updateStok('katul', katulOutput, {
+      updatePromises.push(this.autoUpdateStok('katul', katulOutput, {
         jenisTransaksi: 'masuk',
         referensiId: item.id,
         referensiTabel: 'produksi',
@@ -399,7 +403,7 @@ export class DatabaseStorage implements IStorage {
     }
     
     if (menirOutput > 0) {
-      updatePromises.push(this.updateStok('menir', menirOutput, {
+      updatePromises.push(this.autoUpdateStok('menir', menirOutput, {
         jenisTransaksi: 'masuk',
         referensiId: item.id,
         referensiTabel: 'produksi',
@@ -408,7 +412,7 @@ export class DatabaseStorage implements IStorage {
     }
     
     if (sekamOutput > 0) {
-      updatePromises.push(this.updateStok('sekam', sekamOutput, {
+      updatePromises.push(this.autoUpdateStok('sekam', sekamOutput, {
         jenisTransaksi: 'masuk',
         referensiId: item.id,
         referensiTabel: 'produksi',
@@ -447,7 +451,7 @@ export class DatabaseStorage implements IStorage {
     const jumlah = parseFloat(insertPenjualan.jumlah.toString());
     
     // Validasi stok sebelum penjualan
-    const stockResult = await this.updateStok(jenisBarang, -jumlah, {
+    const stockResult = await this.autoUpdateStok(jenisBarang, -jumlah, {
       jenisTransaksi: 'keluar',
       referensiId: 0, // Temporary, akan diupdate setelah insert
       referensiTabel: 'penjualan',
