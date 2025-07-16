@@ -46,6 +46,7 @@ export const pembelian = pgTable("pembelian", {
   kadarAir: decimal("kadar_air", { precision: 5, scale: 2 }),
   kualitas: text("kualitas"),
   status: text("status").default("pending"),
+  metodePembayaran: text("metode_pembayaran").default("cash"), // cash, transfer
   catatan: text("catatan"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -100,6 +101,7 @@ export const penjualan = pgTable("penjualan", {
   hargaPerKg: decimal("harga_per_kg", { precision: 10, scale: 2 }).notNull(),
   totalHarga: decimal("total_harga", { precision: 12, scale: 2 }).notNull(),
   status: text("status").default("completed"),
+  metodePembayaran: text("metode_pembayaran").default("cash"), // cash, transfer
   catatan: text("catatan"),
   createdAt: timestamp("created_at").defaultNow(),
 });

@@ -30,6 +30,7 @@ type FormData = {
   kadarAir: string;
   kualitas: string;
   status: string;
+  metodePembayaran: string;
   catatan: string;
 };
 
@@ -71,6 +72,7 @@ export default function PembelianGabah() {
       kadarAir: "",
       kualitas: "",
       status: "pending",
+      metodePembayaran: "cash",
       catatan: "",
     },
   });
@@ -238,7 +240,7 @@ export default function PembelianGabah() {
       subtotal: purchase.totalHarga,
       total: purchase.totalHarga,
       notes: purchase.catatan,
-      paymentMethod: "Tunai",
+      paymentMethod: purchase.metodePembayaran === "cash" ? "Tunai" : "Transfer",
     };
 
     generateInvoicePdf(settings, invoiceData);
@@ -436,28 +438,51 @@ export default function PembelianGabah() {
                         )}
                       />
                     </div>
-                    <FormField
-                      control={form.control}
-                      name="status"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Status</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="completed">Completed</SelectItem>
-                              <SelectItem value="cancelled">Cancelled</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Status</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="completed">Completed</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="metodePembayaran"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Metode Pembayaran</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="cash">Tunai</SelectItem>
+                                <SelectItem value="transfer">Transfer</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                     <FormField
                       control={form.control}
                       name="catatan"
@@ -515,17 +540,18 @@ export default function PembelianGabah() {
                     <TableHead>Harga/Kg</TableHead>
                     <TableHead>Total Harga</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Metode Bayar</TableHead>
                     <TableHead>Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center">Loading...</TableCell>
+                      <TableCell colSpan={9} className="text-center">Loading...</TableCell>
                     </TableRow>
                   ) : filteredPembelian?.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center">Belum ada data pembelian</TableCell>
+                      <TableCell colSpan={9} className="text-center">Belum ada data pembelian</TableCell>
                     </TableRow>
                   ) : (
                     filteredPembelian?.map((item: any) => (
@@ -543,6 +569,11 @@ export default function PembelianGabah() {
                         <TableCell>
                           <Badge className={getStatusColor(item.status)}>
                             {item.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {item.metodePembayaran === "cash" ? "Tunai" : "Transfer"}
                           </Badge>
                         </TableCell>
                         <TableCell>

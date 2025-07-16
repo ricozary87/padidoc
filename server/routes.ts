@@ -176,6 +176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               kadarAir: "12",
               kualitas: "A",
               status: "completed",
+              metodePembayaran: "cash",
               catatan: "Kualitas bagus, pengiriman tepat waktu"
             },
             {
@@ -189,6 +190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               kadarAir: "14",
               kualitas: "B",
               status: "completed",
+              metodePembayaran: "transfer",
               catatan: "Standar"
             }
           ];
@@ -306,6 +308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               hargaPerKg: "15000",
               totalHarga: "750000",
               status: "completed",
+              metodePembayaran: "cash",
               catatan: "Pelanggan reguler"
             },
             {
@@ -317,6 +320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               hargaPerKg: "12000",
               totalHarga: "1200000",
               status: "completed",
+              metodePembayaran: "transfer",
               catatan: "Pesanan besar"
             }
           ];

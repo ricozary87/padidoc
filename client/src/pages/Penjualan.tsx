@@ -47,6 +47,7 @@ export default function Penjualan() {
       hargaPerKg: "",
       totalHarga: "",
       status: "completed",
+      metodePembayaran: "cash",
       catatan: "",
     },
   });
@@ -193,7 +194,7 @@ export default function Penjualan() {
       subtotal: sale.totalHarga,
       total: sale.totalHarga,
       notes: sale.catatan,
-      paymentMethod: "Tunai",
+      paymentMethod: sale.metodePembayaran === "cash" ? "Tunai" : "Transfer",
     };
 
     generateInvoicePdf(settings, invoiceData);
@@ -368,28 +369,51 @@ export default function Penjualan() {
                         )}
                       />
                     </div>
-                    <FormField
-                      control={form.control}
-                      name="status"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Status</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="completed">Selesai</SelectItem>
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Status</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="completed">Selesai</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="metodePembayaran"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Metode Pembayaran</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="cash">Tunai</SelectItem>
+                                <SelectItem value="transfer">Transfer</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                     <FormField
                       control={form.control}
                       name="catatan"
@@ -447,17 +471,18 @@ export default function Penjualan() {
                     <TableHead>Harga/Kg</TableHead>
                     <TableHead>Total Harga</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Metode Bayar</TableHead>
                     <TableHead>Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center">Loading...</TableCell>
+                      <TableCell colSpan={9} className="text-center">Loading...</TableCell>
                     </TableRow>
                   ) : filteredPenjualan?.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center">Belum ada data penjualan</TableCell>
+                      <TableCell colSpan={9} className="text-center">Belum ada data penjualan</TableCell>
                     </TableRow>
                   ) : (
                     filteredPenjualan?.map((item: any) => (
@@ -475,6 +500,11 @@ export default function Penjualan() {
                         <TableCell>
                           <Badge className={getStatusColor(item.status)}>
                             {item.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {item.metodePembayaran === "cash" ? "Tunai" : "Transfer"}
                           </Badge>
                         </TableCell>
                         <TableCell>
