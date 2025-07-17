@@ -95,6 +95,8 @@ export default function Settings() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submission - FormData:', formData);
+    console.log('Phone number in formData:', formData.companyPhone);
     if (settings) {
       updateMutation.mutate(formData);
     } else {
@@ -104,7 +106,12 @@ export default function Settings() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    console.log(`Input change - Field: ${name}, Value: ${value}`);
+    setFormData(prev => {
+      const newData = { ...prev, [name]: value };
+      console.log(`FormData after change:`, newData);
+      return newData;
+    });
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

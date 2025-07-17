@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Form Settings</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .form-group { margin: 10px 0; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 300px; padding: 8px; margin-bottom: 10px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .result { margin-top: 20px; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; }
+    </style>
+</head>
+<body>
+    <h1>Test Form Settings - Phone Number Issue</h1>
+    
+    <form id="settingsForm">
+        <div class="form-group">
+            <label for="companyName">Nama Perusahaan:</label>
+            <input type="text" id="companyName" name="companyName" value="">
+        </div>
+        
+        <div class="form-group">
+            <label for="companyPhone">Nomor Telepon:</label>
+            <input type="text" id="companyPhone" name="companyPhone" value="" placeholder="085228003820">
+        </div>
+        
+        <div class="form-group">
+            <label for="companyEmail">Email:</label>
+            <input type="email" id="companyEmail" name="companyEmail" value="">
+        </div>
+        
+        <button type="button" onclick="testFormData()">Test Form Data</button>
+        <button type="button" onclick="submitToAPI()">Submit to API</button>
+    </form>
+    
+    <div id="result" class="result"></div>
+    
+    <script>
+        // Test form data handling
+        function testFormData() {
+            const form = document.getElementById('settingsForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            console.log('Form data:', data);
+            document.getElementById('result').innerHTML = `
+                <h3>Form Data:</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+                <p><strong>Phone Number:</strong> ${data.companyPhone}</p>
+                <p><strong>Phone Length:</strong> ${data.companyPhone ? data.companyPhone.length : 0}</p>
+            `;
+        }
+        
+        // Submit to API
+        async function submitToAPI() {
+            const form = document.getElementById('settingsForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                console.log('API Response:', result);
+                
+                document.getElementById('result').innerHTML = `
+                    <h3>API Response:</h3>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                    <p><strong>Sent Phone:</strong> ${data.companyPhone}</p>
+                    <p><strong>Received Phone:</strong> ${result.data ? result.data.companyPhone : 'N/A'}</p>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `
+                    <h3>Error:</h3>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+        
+        // Auto-fill test data
+        document.getElementById('companyName').value = 'CV CAKRA PAMUNGKAS';
+        document.getElementById('companyPhone').value = '085228003820';
+        document.getElementById('companyEmail').value = 'cakrapamungka@gmail.com';
+        
+        // Monitor input changes
+        document.getElementById('companyPhone').addEventListener('input', function(e) {
+            console.log('Phone input changed:', e.target.value);
+        });
+    </script>
+</body>
+</html>
