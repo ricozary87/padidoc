@@ -57,22 +57,16 @@ function AdminRoute({ component: Component }: { component: React.ComponentType }
 
   if (!isAdmin) {
     return (
-      <Layout>
-        <Card className="mt-8">
-          <CardContent className="p-6">
-            <h2 className="text-xl font-semibold mb-2">403 - Akses Ditolak</h2>
-            <p className="text-gray-600">Anda tidak memiliki izin untuk mengakses halaman ini.</p>
-          </CardContent>
-        </Card>
-      </Layout>
+      <Card className="mt-8">
+        <CardContent className="p-6">
+          <h2 className="text-xl font-semibold mb-2">403 - Akses Ditolak</h2>
+          <p className="text-gray-600">Anda tidak memiliki izin untuk mengakses halaman ini.</p>
+        </CardContent>
+      </Card>
     );
   }
 
-  return (
-    <Layout>
-      <Component />
-    </Layout>
-  );
+  return <Component />;
 }
 
 function Router() {
