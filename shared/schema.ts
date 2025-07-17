@@ -25,6 +25,19 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Activity Log table
+export const activityLog = pgTable("activity_log", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  action: text("action").notNull(), // "login", "logout", "create", "update", "delete"
+  resource: text("resource").notNull(), // "user", "pembelian", "produksi", "penjualan", etc.
+  resourceId: integer("resource_id"), // ID of the affected resource
+  details: text("details"), // Additional details about the action
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Suppliers table
 export const suppliers = pgTable("suppliers", {
   id: serial("id").primaryKey(),
@@ -266,6 +279,24 @@ export const editProfileSchema = z.object({
   message: "Password lama harus diisi saat mengubah password",
   path: ["currentPassword"]
 });
+
+// Activity Log schema
+export const insertActivityLogSchema = createInsertSchema(activityLog).omit({ id: true, createdAt: true });
+
+// User Management schemas
+export const updateUserSchema = z.object({
+  username: z.string().min(1, "Username harus diisi").optional(),
+  email: z.string().email("Email tidak valid").optional(),
+  role: z.enum(["admin", "operator"]).optional(),
+  isActive: z.boolean().optional(),
+});
+
+// Types
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+export type UpdateUser = z.infer<typeof updateUserSchema>;
+export type ActivityLog = typeof activityLog.$inferSelect;
+export type InsertActivityLog = typeof activityLog.$inferInsert;
 export const insertSupplierSchema = createInsertSchema(suppliers).omit({ id: true, createdAt: true });
 export const insertCustomerSchema = createInsertSchema(customers).omit({ id: true, createdAt: true });
 

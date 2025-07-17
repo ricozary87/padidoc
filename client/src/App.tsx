@@ -20,6 +20,7 @@ import Pengeluaran from "@/pages/Pengeluaran";
 import Stok from "@/pages/Stok";
 import Laporan from "@/pages/Laporan";
 import Settings from "@/pages/Settings";
+import ManajemenUser from "@/pages/ManajemenUser";
 import Login from "@/pages/Login";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
@@ -118,6 +119,13 @@ function Router() {
         <AdminRoute>
           <Layout>
             <Settings />
+          </Layout>
+        </AdminRoute>
+      </Route>
+      <Route path="/manajemen-user">
+        <AdminRoute>
+          <Layout>
+            <ManajemenUser />
           </Layout>
         </AdminRoute>
       </Route>

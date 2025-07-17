@@ -118,7 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/auth/users", requireAdmin, async (req, res) => {
+  app.get("/api/users", requireAdmin, async (req, res) => {
     try {
       const users = await storage.getAllUsers();
       res.json(users.map(user => ({
@@ -128,10 +128,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: user.role,
         isActive: user.isActive,
         createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       })));
     } catch (error) {
       console.error("Get users error:", error);
       res.status(500).json({ message: "Gagal mendapatkan data users" });
+    }
+  });
+
+  app.put("/api/users/:id/role", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { role } = req.body;
+      
+      if (!["admin", "operator"].includes(role)) {
+        return res.status(400).json({ message: "Role tidak valid" });
+      }
+
+      const updatedUser = await storage.updateUserRole(parseInt(id), role);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User tidak ditemukan" });
+      }
+
+      res.json({
+        message: "Role berhasil diubah",
+        user: {
+          id: updatedUser.id,
+          username: updatedUser.username,
+          email: updatedUser.email,
+          role: updatedUser.role,
+          isActive: updatedUser.isActive,
+        },
+      });
+    } catch (error) {
+      console.error("Update role error:", error);
+      res.status(500).json({ message: "Gagal mengubah role user" });
+    }
+  });
+
+  app.put("/api/users/:id/status", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { isActive } = req.body;
+      
+      const updatedUser = await storage.updateUserStatus(parseInt(id), isActive);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User tidak ditemukan" });
+      }
+
+      res.json({
+        message: `User berhasil ${isActive ? "diaktifkan" : "dinonaktifkan"}`,
+        user: {
+          id: updatedUser.id,
+          username: updatedUser.username,
+          email: updatedUser.email,
+          role: updatedUser.role,
+          isActive: updatedUser.isActive,
+        },
+      });
+    } catch (error) {
+      console.error("Update status error:", error);
+      res.status(500).json({ message: "Gagal mengubah status user" });
     }
   });
 
