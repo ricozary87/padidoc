@@ -368,34 +368,6 @@ export default function Dashboard() {
               <CardHeader className="p-3 md:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <CardTitle className="text-sm md:text-lg font-inter font-semibold text-gray-900">
-                    Trend Produksi Mingguan
-                  </CardTitle>
-                  <Select defaultValue="7">
-                    <SelectTrigger className="w-full sm:w-40">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="7">7 Hari Terakhir</SelectItem>
-                      <SelectItem value="30">30 Hari Terakhir</SelectItem>
-                      <SelectItem value="90">90 Hari Terakhir</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardHeader>
-              <CardContent className="p-3 md:p-6">
-                <div className="h-48 md:h-64 flex items-center justify-center bg-slate-100 rounded-lg">
-                  <div className="text-center">
-                    <BarChart3 className="h-10 w-10 md:h-12 md:w-12 text-gray-400 opacity-30 mx-auto mb-2" />
-                    <p className="text-sm md:text-base text-gray-500">Data belum tersedia</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm border border-gray-200">
-              <CardHeader className="p-3 md:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <CardTitle className="text-sm md:text-lg font-inter font-semibold text-gray-900">
                     Efisiensi Rendemen
                   </CardTitle>
                   <div className="flex items-center space-x-2">
