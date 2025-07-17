@@ -113,6 +113,24 @@ The system manages eight core entities:
 - **Database**: PostgreSQL database with Drizzle ORM
 - **Process**: Single Node.js process serves both frontend and backend
 
+### Deployment Configuration (Replit)
+- **Start Command**: `npm run build && npm start`
+- **Root Directory**: `/` (project root)
+- **Build Command**: `npm run build`
+- **Production Command**: `npm start`
+- **Port**: Automatically assigned by Replit (uses process.env.PORT)
+
+### Environment Variables Required:
+- **JWT_SECRET**: Strong random secret for JWT token generation
+- **DATABASE_URL**: PostgreSQL connection (provided by Replit)
+- **NODE_ENV**: Set to "production"
+- **SESSION_SECRET**: Strong random secret for sessions
+
+### Autoscale Configuration:
+- **vCPUs**: 4
+- **Machines**: 3
+- **Auto-scaling**: Enabled for production traffic
+
 ### Development Setup
 - **Hot Reload**: Vite HMR for frontend, tsx for backend auto-restart
 - **Database**: Drizzle push for development schema updates
