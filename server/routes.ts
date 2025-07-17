@@ -12,9 +12,121 @@ import {
   insertStokSchema,
   insertLogStokSchema,
   insertSettingsSchema,
+  insertUserSchema,
+  loginUserSchema,
 } from "@shared/schema";
+import { 
+  authenticateToken, 
+  requireAdmin, 
+  requireAuth, 
+  generateToken, 
+  hashPassword, 
+  comparePassword,
+  type AuthenticatedRequest
+} from "./authMiddleware";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Authentication routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = loginUserSchema.parse(req.body);
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user || !user.isActive) {
+        return res.status(401).json({ message: "Email atau password salah" });
+      }
+
+      const isPasswordValid = await comparePassword(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: "Email atau password salah" });
+      }
+
+      const token = generateToken(user.id, user.email, user.role);
+      
+      res.json({
+        token,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+        },
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(400).json({ message: "Data login tidak valid" });
+    }
+  });
+
+  app.post("/api/auth/register", requireAdmin, async (req, res) => {
+    try {
+      const userData = insertUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(userData.email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Email sudah terdaftar" });
+      }
+
+      // Hash password
+      const hashedPassword = await hashPassword(userData.password);
+      
+      const newUser = await storage.createUser({
+        ...userData,
+        password: hashedPassword,
+      });
+
+      res.status(201).json({
+        message: "User berhasil dibuat",
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          email: newUser.email,
+          role: newUser.role,
+        },
+      });
+    } catch (error) {
+      console.error("Register error:", error);
+      res.status(400).json({ message: "Data registrasi tidak valid" });
+    }
+  });
+
+  app.get("/api/auth/me", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User tidak ditemukan" });
+      }
+
+      res.json({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      });
+    } catch (error) {
+      console.error("Get user error:", error);
+      res.status(500).json({ message: "Gagal mendapatkan data user" });
+    }
+  });
+
+  app.get("/api/auth/users", requireAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users.map(user => ({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+      })));
+    } catch (error) {
+      console.error("Get users error:", error);
+      res.status(500).json({ message: "Gagal mendapatkan data users" });
+    }
+  });
+
   // Dashboard routes
   app.get("/api/dashboard/metrics", async (req, res) => {
     try {

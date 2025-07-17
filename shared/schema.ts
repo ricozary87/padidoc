@@ -7,8 +7,10 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  role: text("role").notNull().default("user"),
+  role: text("role").notNull().default("operator"), // "admin", "operator"
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -217,7 +219,18 @@ export const logStokRelations = relations(logStok, ({ one }) => ({
 }));
 
 // PRIORITAS AUDIT - FIXED: Insert schemas dengan validasi yang lebih ketat
-export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true }).extend({
+  email: z.string().email("Email tidak valid"),
+  password: z.string().min(6, "Password minimal 6 karakter"),
+  role: z.enum(["admin", "operator"], {
+    errorMap: () => ({ message: "Role harus admin atau operator" })
+  })
+});
+
+export const loginUserSchema = z.object({
+  email: z.string().email("Email tidak valid"),
+  password: z.string().min(1, "Password harus diisi")
+});
 export const insertSupplierSchema = createInsertSchema(suppliers).omit({ id: true, createdAt: true });
 export const insertCustomerSchema = createInsertSchema(customers).omit({ id: true, createdAt: true });
 

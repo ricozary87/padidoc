@@ -13,10 +13,12 @@ import {
   User,
   LogOut,
   Menu,
-  X
+  X,
+  Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/hooks/useAuth";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: ChartLine, color: "text-gray-600" },
@@ -34,8 +36,17 @@ export default function Sidebar() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { user, logout, isAdmin } = useAuth();
 
   const toggleSidebar = () => setIsOpen(!isOpen);
+
+  // Filter navigation based on user role
+  const filteredNavigation = navigation.filter(item => {
+    if (item.href === "/laporan" || item.href === "/settings") {
+      return isAdmin;
+    }
+    return true;
+  });
 
   return (
     <>
@@ -76,7 +87,7 @@ export default function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 p-3 lg:p-4 space-y-1 lg:space-y-2 overflow-y-auto">
-          {navigation.map((item) => {
+          {filteredNavigation.map((item) => {
             const Icon = item.icon;
             const isActive = location === item.href;
             
@@ -102,14 +113,29 @@ export default function Sidebar() {
         {/* Footer */}
         <div className="p-3 lg:p-4 border-t border-gray-200">
           <div className="flex items-center space-x-2 lg:space-x-3 px-3 py-2 lg:px-4 lg:py-3">
-            <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
-              <User className="h-4 w-4 text-white" />
+            <div className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center",
+              isAdmin ? "bg-red-500" : "bg-blue-500"
+            )}>
+              {isAdmin ? (
+                <Shield className="h-4 w-4 text-white" />
+              ) : (
+                <User className="h-4 w-4 text-white" />
+              )}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">Admin User</p>
-              <p className="text-xs text-gray-500">Administrator</p>
+              <p className="text-sm font-medium text-gray-900">
+                {user?.username || "Loading..."}
+              </p>
+              <p className="text-xs text-gray-500">
+                {user?.role === "admin" ? "Administrator" : "Operator"}
+              </p>
             </div>
-            <button className="text-gray-400 hover:text-gray-600">
+            <button 
+              onClick={logout}
+              className="text-gray-400 hover:text-red-600 transition-colors"
+              title="Logout"
+            >
               <LogOut className="h-3 w-3 lg:h-4 lg:w-4" />
             </button>
           </div>
