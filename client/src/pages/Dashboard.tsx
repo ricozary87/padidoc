@@ -688,7 +688,7 @@ export default function Dashboard() {
                 <div className="pt-3 border-t border-gray-200">
                   <Button 
                     variant="outline" 
-                    className="w-full flex items-center justify-center space-x-2 text-sm hover:bg-blue-50 hover:border-blue-500 transition-colors"
+                    className="w-full flex items-center justify-center space-x-2 text-sm bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700 transition-colors"
                     onClick={() => window.location.href = '/laporan'}
                   >
                     <ExternalLink className="h-4 w-4" />
@@ -790,7 +790,7 @@ export default function Dashboard() {
                     <div className="pt-3 border-t border-gray-200">
                       <Button 
                         variant="outline" 
-                        className="w-full flex items-center justify-center space-x-2 text-sm hover:bg-green-50 hover:border-green-500 transition-colors"
+                        className="w-full flex items-center justify-center space-x-2 text-sm bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700 transition-colors"
                         onClick={() => setLocation('/produksi')}
                       >
                         <TrendingUp className="h-4 w-4" />
