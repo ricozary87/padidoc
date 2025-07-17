@@ -121,15 +121,20 @@ The system manages eight core entities:
 - **Port**: Automatically assigned by Replit (uses process.env.PORT)
 
 ### Environment Variables Required:
-- **JWT_SECRET**: Strong random secret for JWT token generation
+- **JWT_SECRET**: Strong random secret for JWT token generation (Generated: hdY8xJLapqZYxDZoC1jAA7OWqyuWo7vvvv7rijh11x7VlB6ps4Ie9NZuPHi4Mscb)
+- **SESSION_SECRET**: Strong random secret for sessions (Generated: a58aX64gouHvS4QHfsNJ3nDE9HRCSPcsXrsQXhssd408mkhAqjFoNWiVPDlDpBa8)
 - **DATABASE_URL**: PostgreSQL connection (provided by Replit)
 - **NODE_ENV**: Set to "production"
-- **SESSION_SECRET**: Strong random secret for sessions
 
 ### Autoscale Configuration:
 - **vCPUs**: 4
 - **Machines**: 3
 - **Auto-scaling**: Enabled for production traffic
+
+### Default Admin Credentials:
+- **Email**: admin@padidoc.com
+- **Password**: admin123
+- **Important**: Change this password immediately after first login for security
 
 ### Development Setup
 - **Hot Reload**: Vite HMR for frontend, tsx for backend auto-restart
@@ -493,6 +498,29 @@ The architecture supports a complete rice mill operation with real-time inventor
 - ✅ Resource correlation: Activities linked to specific database records
 
 **Status**: User Activity History system fully implemented and operational. Complete audit trail now available for all user actions with real-time monitoring dashboard.
+
+### Production Deployment Configuration (January 17, 2025)
+
+**Deployment Status**: Application configured and ready for production deployment with Replit Autoscale.
+
+**Generated Production Secrets**:
+- **JWT_SECRET**: hdY8xJLapqZYxDZoC1jAA7OWqyuWo7vvvv7rijh11x7VlB6ps4Ie9NZuPHi4Mscb
+- **SESSION_SECRET**: a58aX64gouHvS4QHfsNJ3nDE9HRCSPcsXrsQXhssd408mkhAqjFoNWiVPDlDpBa8
+
+**Deployment Testing Results**:
+- ✅ Authentication: JWT token generation working correctly
+- ✅ API Endpoints: All protected routes accessible with proper authentication
+- ✅ Database Connection: PostgreSQL queries executing successfully
+- ✅ Stock Management: Auto-update system operational
+- ✅ Dashboard Metrics: Real-time data aggregation functional
+
+**Important Notes**:
+- Default admin login: admin@padidoc.com / admin123 (not password123)
+- Change admin password immediately after first login for security
+- All environment variables must be added to Replit Secrets before deployment
+- Application will be available at https://[repl-name].replit.app after deployment
+
+**Status**: Application fully tested and ready for production deployment. All critical features operational with proper authentication and data integrity.
 
 ### Duplicate Sidebar Fix Implementation (January 17, 2025)
 
