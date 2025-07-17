@@ -15,7 +15,8 @@ import {
   Menu,
   X,
   Shield,
-  Users
+  Users,
+  Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -31,6 +32,7 @@ const navigation = [
   { name: "Stok", href: "/stok", icon: Package, color: "text-purple-600" },
   { name: "Laporan", href: "/laporan", icon: BarChart3, color: "text-indigo-600" },
   { name: "Manajemen Pengguna", href: "/manajemen-user", icon: Users, color: "text-blue-600" },
+  { name: "Aktivitas User", href: "/aktivitas-user", icon: Activity, color: "text-purple-600" },
   { name: "Pengaturan", href: "/settings", icon: Settings, color: "text-gray-600" },
 ];
 
@@ -44,7 +46,7 @@ export default function Sidebar() {
 
   // Filter navigation based on user role
   const filteredNavigation = navigation.filter(item => {
-    if (item.href === "/laporan" || item.href === "/settings" || item.href === "/manajemen-user") {
+    if (item.href === "/laporan" || item.href === "/settings" || item.href === "/manajemen-user" || item.href === "/aktivitas-user") {
       return isAdmin;
     }
     return true;

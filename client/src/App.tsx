@@ -21,6 +21,7 @@ import Stok from "@/pages/Stok";
 import Laporan from "@/pages/Laporan";
 import Settings from "@/pages/Settings";
 import ManajemenUser from "@/pages/ManajemenUser";
+import AktivitasUser from "@/pages/AktivitasUser";
 import Login from "@/pages/Login";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
@@ -126,6 +127,13 @@ function Router() {
         <AdminRoute>
           <Layout>
             <ManajemenUser />
+          </Layout>
+        </AdminRoute>
+      </Route>
+      <Route path="/aktivitas-user">
+        <AdminRoute>
+          <Layout>
+            <AktivitasUser />
           </Layout>
         </AdminRoute>
       </Route>

@@ -11,6 +11,7 @@ import {
   logStok,
   settings,
   passwordResetTokens,
+  activityLog,
   type User,
   type InsertUser,
   type Supplier,
@@ -35,6 +36,8 @@ import {
   type InsertSettings,
   type PasswordResetToken,
   type InsertPasswordResetToken,
+  type ActivityLog,
+  type InsertActivityLog,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
@@ -66,6 +69,11 @@ export interface IStorage {
   deactivateUser(id: number): Promise<void>;
   updateUserRole(id: number, role: string): Promise<User | undefined>;
   updateUserStatus(id: number, isActive: boolean): Promise<User | undefined>;
+  
+  // Activity Log operations
+  createActivityLog(log: InsertActivityLog): Promise<ActivityLog>;
+  getAllActivityLogs(): Promise<ActivityLog[]>;
+  getActivityLogsByUser(userId: number): Promise<ActivityLog[]>;
   
   // Password Reset Token operations
   createPasswordResetToken(token: InsertPasswordResetToken): Promise<PasswordResetToken>;
@@ -278,6 +286,20 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id))
       .returning();
     return user || undefined;
+  }
+
+  // Activity Log operations
+  async createActivityLog(logData: InsertActivityLog): Promise<ActivityLog> {
+    const [log] = await db.insert(activityLog).values(logData).returning();
+    return log;
+  }
+
+  async getAllActivityLogs(): Promise<ActivityLog[]> {
+    return await db.select().from(activityLog).orderBy(desc(activityLog.createdAt));
+  }
+
+  async getActivityLogsByUser(userId: number): Promise<ActivityLog[]> {
+    return await db.select().from(activityLog).where(eq(activityLog.userId, userId)).orderBy(desc(activityLog.createdAt));
   }
 
   // Password Reset Token operations

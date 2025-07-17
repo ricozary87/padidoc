@@ -27,6 +27,7 @@ import {
   comparePassword,
   type AuthenticatedRequest
 } from "./authMiddleware";
+import { ActivityLogger } from "./activityLogger";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Helper function to generate reset token
@@ -50,6 +51,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const token = generateToken(user.id, user.email, user.role);
+      
+      // Log login activity
+      await ActivityLogger.logLogin(user.id, req);
       
       res.json({
         token,
@@ -83,6 +87,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...userData,
         password: hashedPassword,
       });
+
+      // Log user creation activity
+      await ActivityLogger.logUserCreation(req.userId!, newUser.id, req);
 
       res.status(201).json({
         message: "User berhasil dibuat",
@@ -150,6 +157,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User tidak ditemukan" });
       }
 
+      // Log role change activity
+      await ActivityLogger.logUserRoleChange(req.userId!, parseInt(id), role, req);
+
       res.json({
         message: "Role berhasil diubah",
         user: {
@@ -176,6 +186,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User tidak ditemukan" });
       }
 
+      // Log status change activity
+      await ActivityLogger.logUserStatusChange(req.userId!, parseInt(id), isActive, req);
+
       res.json({
         message: `User berhasil ${isActive ? "diaktifkan" : "dinonaktifkan"}`,
         user: {
@@ -189,6 +202,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Update status error:", error);
       res.status(500).json({ message: "Gagal mengubah status user" });
+    }
+  });
+
+  // Activity logs endpoint
+  app.get("/api/activity-logs", requireAdmin, async (req, res) => {
+    try {
+      const logs = await storage.getAllActivityLogs();
+      
+      // Enrich logs with user information
+      const enrichedLogs = await Promise.all(
+        logs.map(async (log) => {
+          const user = await storage.getUser(log.userId);
+          return {
+            ...log,
+            user: user ? {
+              id: user.id,
+              username: user.username,
+              email: user.email,
+              role: user.role,
+            } : null,
+          };
+        })
+      );
+      
+      res.json(enrichedLogs);
+    } catch (error) {
+      console.error("Get activity logs error:", error);
+      res.status(500).json({ message: "Gagal mendapatkan riwayat aktivitas" });
     }
   });
 
