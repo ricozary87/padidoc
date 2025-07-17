@@ -15,6 +15,9 @@ import Stok from "@/pages/Stok";
 import Laporan from "@/pages/Laporan";
 import Settings from "@/pages/Settings";
 import Login from "@/pages/Login";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
+import EditProfile from "@/pages/EditProfile";
 import Sidebar from "@/components/Sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -85,7 +88,14 @@ function Router() {
   }
 
   if (!isAuthenticated) {
-    return <Login />;
+    return (
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route path="/forgot-password" component={ForgotPassword} />
+        <Route path="/reset-password" component={ResetPassword} />
+        <Route component={Login} />
+      </Switch>
+    );
   }
 
   return (
@@ -103,7 +113,7 @@ function Router() {
             <Route path="/stok" component={() => <ProtectedRoute component={Stok} />} />
             <Route path="/laporan" component={() => <AdminRoute component={Laporan} />} />
             <Route path="/settings" component={() => <AdminRoute component={Settings} />} />
-            <Route path="/login" component={Login} />
+            <Route path="/edit-profile" component={() => <ProtectedRoute component={EditProfile} />} />
             <Route component={NotFound} />
           </Switch>
         </div>

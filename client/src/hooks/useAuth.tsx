@@ -18,6 +18,7 @@ interface AuthContextType {
   hasRole: (role: string) => boolean;
   isAdmin: boolean;
   isOperator: boolean;
+  updateUserContext: (updatedUser: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -112,6 +113,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const updateUserContext = (updatedUser: User) => {
+    setUser(updatedUser);
+  };
+
   const hasRole = (role: string) => {
     return user?.role === role;
   };
@@ -129,6 +134,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     hasRole,
     isAdmin,
     isOperator,
+    updateUserContext,
   };
 
   return (

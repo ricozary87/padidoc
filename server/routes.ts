@@ -14,6 +14,9 @@ import {
   insertSettingsSchema,
   insertUserSchema,
   loginUserSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  editProfileSchema,
 } from "@shared/schema";
 import { 
   authenticateToken, 
@@ -26,6 +29,11 @@ import {
 } from "./authMiddleware";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Helper function to generate reset token
+  const generateResetToken = () => {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  };
+
   // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
     try {
@@ -124,6 +132,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get users error:", error);
       res.status(500).json({ message: "Gagal mendapatkan data users" });
+    }
+  });
+
+  // Forgot password route
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = forgotPasswordSchema.parse(req.body);
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if user exists or not for security
+        return res.json({ message: "Jika email terdaftar, link reset password akan dikirim." });
+      }
+
+      // Generate reset token
+      const resetToken = generateResetToken();
+      const expiresAt = new Date(Date.now() + 3600000); // 1 hour from now
+
+      await storage.createPasswordResetToken({
+        userId: user.id,
+        token: resetToken,
+        expiresAt,
+        isUsed: false,
+      });
+
+      // In production, send email with reset link
+      // For now, we'll just return the token (remove this in production)
+      res.json({ 
+        message: "Link reset password telah dikirim ke email Anda.",
+        // Remove this in production - only for testing
+        resetToken: resetToken
+      });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(400).json({ message: "Data tidak valid" });
+    }
+  });
+
+  // Reset password route
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = resetPasswordSchema.parse(req.body);
+      
+      const resetToken = await storage.getPasswordResetToken(token);
+      if (!resetToken) {
+        return res.status(400).json({ message: "Token tidak valid atau sudah kadaluarsa" });
+      }
+
+      // Hash new password
+      const hashedPassword = await hashPassword(newPassword);
+      
+      // Update user password
+      await storage.updateUser(resetToken.userId, { password: hashedPassword });
+      
+      // Mark token as used
+      await storage.markPasswordResetTokenAsUsed(resetToken.id);
+      
+      res.json({ message: "Password berhasil diubah" });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      res.status(400).json({ message: "Data tidak valid" });
+    }
+  });
+
+  // Edit profile route
+  app.post("/api/auth/edit-profile", authenticateToken, async (req: AuthenticatedRequest, res) => {
+    try {
+      const profileData = editProfileSchema.parse(req.body);
+      
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User tidak ditemukan" });
+      }
+
+      // If changing password, verify current password
+      if (profileData.newPassword && profileData.currentPassword) {
+        const isCurrentPasswordValid = await comparePassword(profileData.currentPassword, user.password);
+        if (!isCurrentPasswordValid) {
+          return res.status(400).json({ message: "Password lama tidak benar" });
+        }
+      }
+
+      // Check if email is already taken by another user
+      if (profileData.email && profileData.email !== user.email) {
+        const existingUser = await storage.getUserByEmail(profileData.email);
+        if (existingUser) {
+          return res.status(400).json({ message: "Email sudah digunakan oleh user lain" });
+        }
+      }
+
+      // Check if username is already taken by another user
+      if (profileData.username && profileData.username !== user.username) {
+        const existingUser = await storage.getUserByUsername(profileData.username);
+        if (existingUser) {
+          return res.status(400).json({ message: "Username sudah digunakan oleh user lain" });
+        }
+      }
+
+      // Prepare update data
+      const updateData: Partial<InsertUser> = {};
+      if (profileData.username) updateData.username = profileData.username;
+      if (profileData.email) updateData.email = profileData.email;
+      if (profileData.newPassword) {
+        updateData.password = await hashPassword(profileData.newPassword);
+      }
+
+      // Update user
+      const updatedUser = await storage.updateUser(req.userId!, updateData);
+      
+      res.json({
+        message: "Profil berhasil diperbarui",
+        user: {
+          id: updatedUser.id,
+          username: updatedUser.username,
+          email: updatedUser.email,
+          role: updatedUser.role,
+        }
+      });
+    } catch (error) {
+      console.error("Edit profile error:", error);
+      res.status(400).json({ message: "Data tidak valid" });
     }
   });
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -101,6 +101,14 @@ export default function Login() {
               )}
             </Button>
           </form>
+          
+          <div className="mt-4 text-center">
+            <Link href="/forgot-password">
+              <Button variant="ghost" className="text-sm text-blue-600 hover:text-blue-800">
+                Lupa password?
+              </Button>
+            </Link>
+          </div>
           
           <div className="mt-6 text-center text-sm text-gray-600">
             <p>Demo Login:</p>

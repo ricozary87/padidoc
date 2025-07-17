@@ -131,13 +131,23 @@ export default function Sidebar() {
                 {user?.role === "admin" ? "Administrator" : "Operator"}
               </p>
             </div>
-            <button 
-              onClick={logout}
-              className="text-gray-400 hover:text-red-600 transition-colors"
-              title="Logout"
-            >
-              <LogOut className="h-3 w-3 lg:h-4 lg:w-4" />
-            </button>
+            <div className="flex items-center space-x-2">
+              <Link href="/edit-profile">
+                <button 
+                  className="text-gray-400 hover:text-blue-600 transition-colors"
+                  title="Edit Profile"
+                >
+                  <Settings className="h-3 w-3 lg:h-4 lg:w-4" />
+                </button>
+              </Link>
+              <button 
+                onClick={logout}
+                className="text-gray-400 hover:text-red-600 transition-colors"
+                title="Logout"
+              >
+                <LogOut className="h-3 w-3 lg:h-4 lg:w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

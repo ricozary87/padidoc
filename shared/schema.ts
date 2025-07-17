@@ -15,6 +15,16 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Password Reset Tokens table
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  isUsed: boolean("is_used").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Suppliers table
 export const suppliers = pgTable("suppliers", {
   id: serial("id").primaryKey(),
@@ -231,6 +241,31 @@ export const loginUserSchema = z.object({
   email: z.string().email("Email tidak valid"),
   password: z.string().min(1, "Password harus diisi")
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Email tidak valid")
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token harus diisi"),
+  newPassword: z.string().min(6, "Password baru minimal 6 karakter")
+});
+
+export const editProfileSchema = z.object({
+  username: z.string().min(1, "Username harus diisi").optional(),
+  email: z.string().email("Email tidak valid").optional(),
+  currentPassword: z.string().min(1, "Password lama harus diisi").optional(),
+  newPassword: z.string().min(6, "Password baru minimal 6 karakter").optional(),
+}).refine((data) => {
+  // Jika ada newPassword, maka currentPassword harus diisi
+  if (data.newPassword && !data.currentPassword) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Password lama harus diisi saat mengubah password",
+  path: ["currentPassword"]
+});
 export const insertSupplierSchema = createInsertSchema(suppliers).omit({ id: true, createdAt: true });
 export const insertCustomerSchema = createInsertSchema(customers).omit({ id: true, createdAt: true });
 
@@ -368,6 +403,7 @@ export const insertStokSchema = createInsertSchema(stok).omit({ id: true, update
 
 export const insertLogStokSchema = createInsertSchema(logStok).omit({ id: true, createdAt: true });
 export const insertSettingsSchema = createInsertSchema(settings).omit({ id: true, updatedAt: true });
+export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTokens).omit({ id: true, createdAt: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -392,3 +428,5 @@ export type LogStok = typeof logStok.$inferSelect;
 export type InsertLogStok = z.infer<typeof insertLogStokSchema>;
 export type Settings = typeof settings.$inferSelect;
 export type InsertSettings = z.infer<typeof insertSettingsSchema>;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type InsertPasswordResetToken = z.infer<typeof insertPasswordResetTokenSchema>;
