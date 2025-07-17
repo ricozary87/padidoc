@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Bell, ShoppingCart, Settings, DollarSign, Package, BarChart3, Calculator, Plus, CheckCircle, XCircle, Scale, TrendingUp, TrendingDown, Wallet, ExternalLink } from "lucide-react";
-import Sidebar from "@/components/Sidebar";
+
 import MetricsCard from "@/components/MetricsCard";
 import RecentActivities from "@/components/RecentActivities";
 import QuickActions from "@/components/QuickActions";
@@ -199,44 +199,39 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-            <div className="flex items-center justify-between">
+      <div className="flex flex-col min-h-screen">
+        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Skeleton className="h-8 w-48 mb-2" />
+              <Skeleton className="h-4 w-80" />
+            </div>
+            <div className="flex items-center space-x-4">
+              <Skeleton className="h-6 w-6 rounded-full" />
               <div>
-                <Skeleton className="h-8 w-48 mb-2" />
-                <Skeleton className="h-4 w-80" />
-              </div>
-              <div className="flex items-center space-x-4">
-                <Skeleton className="h-6 w-6 rounded-full" />
-                <div>
-                  <Skeleton className="h-4 w-32 mb-1" />
-                  <Skeleton className="h-3 w-16" />
-                </div>
+                <Skeleton className="h-4 w-32 mb-1" />
+                <Skeleton className="h-3 w-16" />
               </div>
             </div>
-          </header>
-          <main className="flex-1 p-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-32" />
-              ))}
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Skeleton className="h-80" />
-              <Skeleton className="h-80" />
-            </div>
-          </main>
-        </div>
+          </div>
+        </header>
+        <main className="flex-1 p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-32" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Skeleton className="h-80" />
+            <Skeleton className="h-80" />
+          </div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
+    <div className="flex flex-col min-h-screen">
         {/* Header */}
         <header className="bg-white shadow-sm border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between">
@@ -818,6 +813,5 @@ export default function Dashboard() {
           <QuickActions />
         </main>
       </div>
-    </div>
-  );
+    );
 }

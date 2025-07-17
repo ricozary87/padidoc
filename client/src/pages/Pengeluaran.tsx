@@ -6,7 +6,7 @@ import { Plus, Edit, Trash2, Search, Receipt } from "lucide-react";
 import { insertPengeluaranSchema } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import Sidebar from "@/components/Sidebar";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -178,9 +178,7 @@ export default function Pengeluaran() {
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
+    <div className="flex flex-col min-h-screen">
         <header className="bg-white shadow-sm border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center space-x-3">
@@ -383,7 +381,6 @@ export default function Pengeluaran() {
             </CardContent>
           </Card>
         </main>
-      </div>
     </div>
   );
 }

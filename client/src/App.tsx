@@ -18,7 +18,7 @@ import Login from "@/pages/Login";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 import EditProfile from "@/pages/EditProfile";
-import Sidebar from "@/components/Sidebar";
+import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
@@ -57,23 +57,22 @@ function AdminRoute({ component: Component }: { component: React.ComponentType }
 
   if (!isAdmin) {
     return (
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex-1 overflow-auto">
-          <div className="container mx-auto p-6">
-            <Card className="mt-8">
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-2">403 - Akses Ditolak</h2>
-                <p className="text-gray-600">Anda tidak memiliki izin untuk mengakses halaman ini.</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
+      <Layout>
+        <Card className="mt-8">
+          <CardContent className="p-6">
+            <h2 className="text-xl font-semibold mb-2">403 - Akses Ditolak</h2>
+            <p className="text-gray-600">Anda tidak memiliki izin untuk mengakses halaman ini.</p>
+          </CardContent>
+        </Card>
+      </Layout>
     );
   }
 
-  return <Component />;
+  return (
+    <Layout>
+      <Component />
+    </Layout>
+  );
 }
 
 function Router() {
@@ -99,26 +98,21 @@ function Router() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="container mx-auto p-6">
-          <Switch>
-            <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
-            <Route path="/pembelian" component={() => <ProtectedRoute component={PembelianGabah} />} />
-            <Route path="/pengeringan" component={() => <ProtectedRoute component={Pengeringan} />} />
-            <Route path="/produksi" component={() => <ProtectedRoute component={Produksi} />} />
-            <Route path="/penjualan" component={() => <ProtectedRoute component={Penjualan} />} />
-            <Route path="/pengeluaran" component={() => <ProtectedRoute component={Pengeluaran} />} />
-            <Route path="/stok" component={() => <ProtectedRoute component={Stok} />} />
-            <Route path="/laporan" component={() => <AdminRoute component={Laporan} />} />
-            <Route path="/settings" component={() => <AdminRoute component={Settings} />} />
-            <Route path="/edit-profile" component={() => <ProtectedRoute component={EditProfile} />} />
-            <Route component={NotFound} />
-          </Switch>
-        </div>
-      </div>
-    </div>
+    <Layout>
+      <Switch>
+        <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
+        <Route path="/pembelian" component={() => <ProtectedRoute component={PembelianGabah} />} />
+        <Route path="/pengeringan" component={() => <ProtectedRoute component={Pengeringan} />} />
+        <Route path="/produksi" component={() => <ProtectedRoute component={Produksi} />} />
+        <Route path="/penjualan" component={() => <ProtectedRoute component={Penjualan} />} />
+        <Route path="/pengeluaran" component={() => <ProtectedRoute component={Pengeluaran} />} />
+        <Route path="/stok" component={() => <ProtectedRoute component={Stok} />} />
+        <Route path="/laporan" component={() => <AdminRoute component={Laporan} />} />
+        <Route path="/settings" component={() => <AdminRoute component={Settings} />} />
+        <Route path="/edit-profile" component={() => <ProtectedRoute component={EditProfile} />} />
+        <Route component={NotFound} />
+      </Switch>
+    </Layout>
   );
 }
 

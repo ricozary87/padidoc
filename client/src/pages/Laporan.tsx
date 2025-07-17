@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { BarChart3, Download, Calendar, TrendingUp, TrendingDown } from "lucide-react";
-import Sidebar from "@/components/Sidebar";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -95,9 +95,7 @@ export default function Laporan() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
+    <div className="flex flex-col min-h-screen">
         <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -387,7 +385,6 @@ export default function Laporan() {
             </CardContent>
           </Card>
         </main>
-      </div>
     </div>
   );
 }
