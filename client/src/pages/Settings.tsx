@@ -61,7 +61,8 @@ export default function Settings() {
         description: "Pengaturan berhasil disimpan",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Create error:', error);
       toast({
         title: "Error",
         description: "Gagal menyimpan pengaturan",
@@ -72,8 +73,8 @@ export default function Settings() {
 
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      await apiRequest(`/api/settings/${settings.id}`, {
-        method: "PUT",
+      await apiRequest("/api/settings", {
+        method: "POST",
         body: JSON.stringify(data),
       });
     },
@@ -84,7 +85,8 @@ export default function Settings() {
         description: "Pengaturan berhasil diperbarui",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Update error:', error);
       toast({
         title: "Error",
         description: "Gagal memperbarui pengaturan",
